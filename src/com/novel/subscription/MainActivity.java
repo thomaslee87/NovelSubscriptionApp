@@ -9,7 +9,7 @@ import org.apache.http.util.EncodingUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.example.novel.R;
+import com.novel.subscription.R;
 
 import android.app.ActivityGroup;
 import android.content.ContentValues;

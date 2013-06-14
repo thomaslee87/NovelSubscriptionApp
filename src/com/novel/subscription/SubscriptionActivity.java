@@ -10,7 +10,7 @@ import java.util.Queue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.example.novel.R;
+import com.novel.subscription.R;
 
 import android.app.Activity;
 import android.app.AlertDialog;

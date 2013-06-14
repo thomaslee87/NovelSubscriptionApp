@@ -3,7 +3,7 @@ package com.novel.subscription;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.example.novel.R;
+import com.novel.subscription.R;
 
 import android.content.Context;
 import android.graphics.Color;

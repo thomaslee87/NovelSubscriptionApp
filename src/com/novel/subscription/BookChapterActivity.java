@@ -13,7 +13,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 
-import com.example.novel.R;
+import com.novel.subscription.R;
 
 import android.app.Activity;
 import android.content.ContentValues;
