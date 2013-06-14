@@ -1,4 +1,4 @@
-package com.example.novel;
+package com.novel.subscription;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -11,7 +11,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.example.novel.NovelDatabaseHelper;
+import com.novel.subscription.NovelDatabaseHelper;
 
 public class NovelDB {
 	private NovelDatabaseHelper dbHelper;  

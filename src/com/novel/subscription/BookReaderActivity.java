@@ -1,7 +1,9 @@
-package com.example.novel;
+package com.novel.subscription;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import com.example.novel.R;
 
 import android.app.Activity;
 import android.content.ContentValues;

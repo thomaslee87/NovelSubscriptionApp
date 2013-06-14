@@ -1,4 +1,4 @@
-package com.example.novel;
+package com.novel.subscription;
 
 import java.io.InputStream;
 import java.net.URLDecoder;
@@ -8,6 +8,8 @@ import java.util.Iterator;
 import org.apache.http.util.EncodingUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import com.example.novel.R;
 
 import android.app.ActivityGroup;
 import android.content.ContentValues;

@@ -1,4 +1,4 @@
-package com.example.novel;
+package com.novel.subscription;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;

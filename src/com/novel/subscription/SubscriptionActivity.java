@@ -1,4 +1,4 @@
-package com.example.novel;
+package com.novel.subscription;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -9,6 +9,8 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import com.example.novel.R;
 
 import android.app.Activity;
 import android.app.AlertDialog;

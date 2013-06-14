@@ -1,4 +1,6 @@
-package com.example.novel;
+package com.novel.subscription;
+
+import com.example.novel.R;
 
 import android.app.Activity;
 import android.os.Bundle;

@@ -1,22 +1,25 @@
-package com.example.novel;
+package com.novel.subscription;
 
 import java.util.List;
 
+import com.example.novel.R;
+
 import android.content.Context;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-public class BookChapterListViewAdapter extends BaseAdapter {  
+public class MoreSourceListViewAdapter extends BaseAdapter {  
 	
-    private List<BookChapterEntity> items;  
+    private List<ChooseSourceActivity.SourceSiteEntity> items;  
+    
     private LayoutInflater inflater;  
       
-    public BookChapterListViewAdapter(Context context, List<BookChapterEntity> items) {  
+    public MoreSourceListViewAdapter(Context context, List<ChooseSourceActivity.SourceSiteEntity> items) {  
         this.items = items;  
+        
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE); 
     }  
       
@@ -38,16 +41,18 @@ public class BookChapterListViewAdapter extends BaseAdapter {
     @Override  
     public View getView(int position, View view, ViewGroup parent) {  
         if (view == null) {  
-            view = inflater.inflate(R.layout.chapter_list_item, null);  
+            view = inflater.inflate(R.layout.more_source_list_item, null);  
         }  
-        TextView tvChapter = (TextView) view.findViewById(R.id.liChapter);
-        tvChapter.setText(items.get(position).getChapterTitle());
-//        if(items.get(position).getIsRead() == 0)
-//        	view.setBackgroundColor(Color.argb(0x80, 0xFF, 0xCC, 0));
+        ChooseSourceActivity.SourceSiteEntity moreSrcEntity = items.get(position);
+        TextView tvName = (TextView) view.findViewById(R.id.list_item_site);
+        tvName.setText(moreSrcEntity.site);
+        TextView tvTitle = (TextView)view.findViewById(R.id.latest_title);
+        tvTitle.setText(moreSrcEntity.update);
+        
         return view;
     }
     
-    public void addItem(BookChapterEntity item) {  
+    public void addItem(ChooseSourceActivity.SourceSiteEntity item) {  
         items.add(item);  
     }  
     

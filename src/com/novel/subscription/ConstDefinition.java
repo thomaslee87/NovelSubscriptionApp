@@ -1,4 +1,4 @@
-package com.example.novel;
+package com.novel.subscription;
 
 public class ConstDefinition {
 	public static final String BOOK_LIST_URL = "http://serviceinterface.sinaapp.com/book_list.php";
