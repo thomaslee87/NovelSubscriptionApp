@@ -24,6 +24,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
            </intent-filter>
         </service>
+        <service android:name="SchedulerEventService" android:process=":hascode_process"/>
+        
+        <receiver android:name="SchedulerSetupReceiver" android:process=":hascode_process">
+		    <intent-filter >
+		        <action android:name="android.intent.action.BOOT_COMPLETED" />
+		        <action android:name="android.intent.action.USER_PRESENT" />
+		    </intent-filter>
+		</receiver>
+		<receiver android:name="SchedulerEventReceiver" android:process=":hascode_process"/>
         
         <activity
             android:name="com.novel.subscription.MainActivity"

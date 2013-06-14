@@ -28,6 +28,7 @@ import android.database.Cursor;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
@@ -112,7 +113,7 @@ public class UpdateService extends Service {
     
     public class ReadUpdateDataTask {
     	private Context context;
-    	private long period = 30000;
+    	private long period = 30 * 1000;
 
     	public ReadUpdateDataTask(Context context) {
     		this.context = context;
@@ -139,6 +140,7 @@ public class UpdateService extends Service {
     	class TaskTimer extends TimerTask {
         	public boolean isRunning;
         	public boolean firstStartup;
+        	public int position;
         	
         	private Context context;
         	private ArrayList<SubscriptionEntity> items = new ArrayList<SubscriptionEntity>();
@@ -148,150 +150,134 @@ public class UpdateService extends Service {
         		this.context = context;
         	}
 
-    		public String getHtmlByGet(String _url){
-    			String result = "";
-    			HttpClient client = new DefaultHttpClient();
-    	        try {
-    	            HttpGet get = new HttpGet(_url);
-    	            get.setHeader("Accept-Charset", "GBK"); 
-    	            HttpResponse response = client.execute(get); 
-    	            HttpEntity resEntity = response.getEntity();
-    	            if (resEntity != null) {    
-    	                result = EntityUtils.toString(resEntity,"GBK");
-    	            }
-    	        } catch (Exception e) {
-    	        	Log.i("ReadList", "In getHtmlByGet: " + e.toString());
-    	            e.printStackTrace();
-    	        } finally {
-    	        	client.getConnectionManager().shutdown();
-    	        }
-    	        return result;
-    	    }
+                @Override
+                public void run()
+                {
+                	isRunning = true;
+                	NovelDB db = new NovelDB(getApplicationContext());
 
-            @Override
-            public void run()
-            {
-            	items.clear();
-            	db = new NovelDB(context);
-        		Cursor cursor = db.getRecordsBySQL("select * from subscription where valid=1 ");
-        		try {
-        			if(cursor != null && cursor.moveToFirst()) {
-        				while(!cursor.isAfterLast()) {
-        					int _id = cursor.getInt(0);
-        					int bookId = cursor.getInt(1);
-        					String latestTitle = cursor.getString(2);
-        					String latestUrl = cursor.getString(3);
-        					String readTitle = cursor.getString(4);
-        					String readUrl = cursor.getString(5);
-        					int valid = cursor.getInt(6);
-        					
-        					Cursor cursorBook = db.getRecordsBySQL("select * from book_list where _id = " + bookId);
-        					try {
-        						if(cursorBook.moveToFirst()) {
-        							Cursor cursorSource = db.getRecordsBySQL("select * from source where id=" + cursorBook.getInt(1));
-        							try {
-        								if(cursorSource.moveToFirst()) {
-        									SourceEntity srcEntity = SourceEntity.getSourceEntityFromRecord(cursorSource);
-        									
-        									BookEntity book = new BookEntity(cursorBook.getInt(0), cursorBook.getString(3), 
-        										cursorBook.getString(5), cursorBook.getString(4),cursorBook.getString(8), 
-        										cursorBook.getInt(9), cursorBook.getString(10), srcEntity);
-        									
-        									SubscriptionEntity subscription = 
-        											new SubscriptionEntity(_id, bookId, latestTitle, latestUrl, readTitle, readUrl, valid, book);
-        									
-        									items.add(subscription);
-        								}
-        							} finally {
-        								cursorSource.close();
-        							}
-        						}
-        					} finally {
-        						cursorBook.close();
-        					}
-        					cursor.moveToNext();
-        				}
-        			}
-        		} finally {
-        			cursor.close();
-        		}
-            	
-            	
-            	isRunning = true;
-            	
-            	Queue<BookChapterEntity> chapterQueue = new LinkedList<BookChapterEntity>();
-            	
-            	boolean needUpdateDb = false;
-            	
-            	for(int i = 0; i < items.size(); i ++) {
-            		SubscriptionEntity subscription = items.get(i);
-            		BookEntity book = subscription.getBook();
-            		String res = getHtmlByGet(book.getSrcEntity().getDomain() + book.getUrl());
-            		
-            		Pattern pChapter = Pattern.compile(book.getSrcEntity().getPatternChapter());
-                	Pattern pBody = Pattern.compile(book.getSrcEntity().getPatternBody());
-                	Pattern pOrder = Pattern.compile(book.getSrcEntity().getPatternOrder());
-                	Pattern pLatestTitle = Pattern.compile(book.getSrcEntity().getPatternLatestTitle());
+                	Queue<BookChapterEntity> chapterQueue = new LinkedList<BookChapterEntity>();
                 	
-                	Matcher mLatestTitle = pLatestTitle.matcher(res);
-            		if(mLatestTitle.find()) {
-            			if(mLatestTitle.group(1).equals(subscription.getLatestTitle()))
-            				continue;
-            			else
-            				needUpdateDb = true;
-//    	        			Message msg = handler.obtainMessage();
-//    	        			msg.what = UPDATING_CODE;
-//    	        			Bundle bundle = new Bundle();
-//    	        			bundle.putInt("id", subscription.getId());
-//    	        			bundle.putString("title", mLatestTitle.group(1));
-//    	        			msg.setData(bundle);
-//    	        			handler.sendMessage(msg);
-            		}
+                	boolean needUpdateDb = true;//false;
+                	int curPage = 0, totalPage = 0;
+                	int fetchPageNum = -1;
+                	for(int i = 0; i < items.size(); i ++) {
+
+                		if(position != -1 && i != position)
+                			continue;
+                		
+                		SubscriptionEntity subscription = items.get(i);
+                		BookEntity book = subscription.getBook();
+                		
+                		fetchPageNum = -1;
+                		curPage = 0;
+                		totalPage = 0;
+                		
+                		Pattern pChapter = Pattern.compile(book.getSrcEntity().getPatternChapter());
+                    	Pattern pBody = Pattern.compile(book.getSrcEntity().getPatternBody());
+                    	Pattern pOrder = Pattern.compile(book.getSrcEntity().getPatternOrder());
+                    	Pattern pLatestTitle = Pattern.compile(book.getSrcEntity().getPatternLatestTitle());
+                    	Pattern pPage = Pattern.compile(book.getSrcEntity().getPatternPage());
+                    	Pattern pInvalidTitle = Pattern.compile("<.*>.*</.*>");
+                		
+                		//从最后一页开始查找，即从最新开始找
+                		do{
+        	        		String res = HtmlService.getHtmlByGet(book.getSrcEntity().getDomain() + book.getUrl() + "&pi=" + fetchPageNum);
+        	            	
+        	            	Matcher mLatestTitle = pLatestTitle.matcher(res);
+        	        		if(mLatestTitle.find()) {
+        	        			if(mLatestTitle.group(1).equals(subscription.getLatestTitle()))
+        	        				continue;
+        	        			else
+        	        				needUpdateDb = true;
+        	//        			Message msg = handler.obtainMessage();
+        	//        			msg.what = UPDATING_CODE;
+        	//        			Bundle bundle = new Bundle();
+        	//        			bundle.putInt("id", subscription.getId());
+        	//        			bundle.putString("title", mLatestTitle.group(1));
+        	//        			msg.setData(bundle);
+        	//        			handler.sendMessage(msg);
+        	        		}
+        	            	
+        	        		Matcher mBody = pBody.matcher(res);
+        	    			String url = "";
+        	    			String title = "";
+        	    			String lastUrl, lastTitle;
+        	        		if(mBody.find()) {
+        	        			String body = mBody.group(1);
+        	            		Matcher m = pChapter.matcher(body);
+        	            		while(m.find()){// && isRunning) {
+//        	            			if(chapterQueue.size() >= UPDATE_LIST_COUNT) {
+//        	            				chapterQueue.remove();
+//        	            				fetchPageNum = 0;
+//        	            				break;
+//        	            			}
+        	            			lastUrl = url;
+        	            			lastTitle = title;
+        	            			
+        	            			url = m.group(1).replaceAll("&amp;", "&");
+        	            			title = m.group(2);
+        	            			if(pInvalidTitle.matcher(title).find())
+        	            				continue;
+        	            			Matcher mUrlOrder = pOrder.matcher(url);
+        	            			if(mUrlOrder.find()) {
+        	            				int chapterOrder = 0;
+        	            				try {
+        	            					chapterOrder = Integer.parseInt(mUrlOrder.group(1));
+        	            				}catch (Exception e) {
+        	            					Log.i("test", book.getName() + " " + mUrlOrder.group());
+        	            					url = lastUrl;
+        	            					title = lastTitle;
+        	            					continue;
+        	            				}
+        	            				if(chapterOrder > book.getUpdateOrder())
+        	            					chapterQueue.add(new BookChapterEntity(-1, title, url, 0, 0, 0, chapterOrder, 1, book));
+        	            				else 
+        	            					fetchPageNum = 0; // 到了上次更新的地方，说明读完本页就可以结束循环了
+        	            			}
+        	            		}
+        	            		if(totalPage == 0 && !url.equals("")) {
+        	            			ContentValues values = new ContentValues();
+        	            			values.put(NovelDB.SUBSCRIPTION_LATEST_TITLE, title);
+        	            			values.put(NovelDB.SUBSCRIPTION_LATEST_URL, url);
+        	            			db.update(NovelDB.SUBSCRIPTION_TABLE, values, "_id = " + subscription.getId(), null);
+        	            		}
+        	        		}
+        	        		if(totalPage == 0) {
+        	        			curPage = 1;
+        	        			totalPage = 1;
+        		        		Matcher mPage = pPage.matcher(res);
+        		        		if(mPage.find()) {
+        		        			curPage = Integer.parseInt(mPage.group(1));
+        		        			totalPage = Integer.parseInt(mPage.group(2));
+        		        		}
+        		        		fetchPageNum = totalPage;
+        	        		}
+        	        		fetchPageNum --;
+                		} while (fetchPageNum > 0);
+                		
+                	}
                 	
-            		Matcher mBody = pBody.matcher(res);
-        			String url = "";
-        			String title = "";
-            		if(mBody.find()) {
-            			String body = mBody.group(1);
-                		Matcher m = pChapter.matcher(body);
-                		while(m.find() && isRunning) {
-//    	            			if(chapterQueue.size() >= UPDATE_LIST_COUNT)
-//    	            				chapterQueue.remove();
-                			url = m.group(1);
-                			title = m.group(2);
-                			Matcher mUrlOrder = pOrder.matcher(url);
-                			if(mUrlOrder.find()) {
-                				int chapterOrder = Integer.parseInt(mUrlOrder.group(1));
-                				if(chapterOrder > book.getUpdateOrder())
-                					chapterQueue.add(new BookChapterEntity(-1, title, url, 0, 0, 0, chapterOrder, 1, book));
-                			}
-                		}
-                		if(!url.equals("")) {
-                			ContentValues values = new ContentValues();
-                			values.put(NovelDB.SUBSCRIPTION_LATEST_TITLE, title);
-                			values.put(NovelDB.SUBSCRIPTION_LATEST_URL, url);
-                			db.update(NovelDB.SUBSCRIPTION_TABLE, values, "_id = " + subscription.getId(), null);
-                		}
-            		}
-            	}
-            	
-            	if(needUpdateDb) {
-            		db.beginTransaction();
-    		        try {
-    		        	while(!chapterQueue.isEmpty()) 
-    		        		db.addChapter(chapterQueue.remove());
-    		        	db.setTransactionSuccessful();
-    		        } finally {
-    		        	db.endTransaction();
-    		        	db.close();
-    		        }
-    		        handler.sendEmptyMessage(1);
-            	}
-            	else {
-            		db.close();
-            	}
+                	if(needUpdateDb) {
+                		db.beginTransaction();
+        		        try {
+        		        	while(!chapterQueue.isEmpty()) 
+        		        		db.addChapter(chapterQueue.remove());
+        		        	db.setTransactionSuccessful();
+        		        } finally {
+        		        	db.endTransaction();
+        		        	db.close();
+        		        }
+                	}
+                	else {
+                		db.close();
+                	}
+        	        		
+                	isRunning = false;
+                	handler.sendEmptyMessage(1);
+                }
             }
-        }
-    }
+
+    	}
 
 }
