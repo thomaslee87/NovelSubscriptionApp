@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>  
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"  
+    android:orientation="vertical"  
+    android:layout_width="fill_parent"  
+    android:layout_height="fill_parent">  
+      
+    <LinearLayout 
+        android:id="@+id/loading"
+        android:orientation="vertical"
+	    android:layout_width="fill_parent"  
+	    android:layout_height="fill_parent"
+	    android:visibility="gone">  
+
+	    <ProgressBar
+			style="?android:attr/progressBarStyle"
+	       	android:layout_width="wrap_content"   
+	       	android:layout_height="wrap_content"  
+	  	 	android:layout_gravity="center"
+	  	 	/>
+    </LinearLayout>
+    <!-- Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/btnReload"
+        android:text="重新加载"
+        /-->
+	<WebView
+       android:id="@+id/bookDisplayer"  
+       android:layout_width="fill_parent"  
+       android:layout_height="fill_parent"  
+       android:paddingTop="5dp"  
+       android:paddingBottom="5dp"
+     	/>
+    
+</LinearLayout> 

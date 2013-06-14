@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<resources>
+    <string name="app_name">追书</string>
+    <string name="action_settings">设置</string>
+    <string name="ding_yue">我的订阅</string>
+    <string name="ding_zhi">个人定制</string>
+    <string name="setting">设置</string>
+    <string name="help">帮助</string>
+</resources>
