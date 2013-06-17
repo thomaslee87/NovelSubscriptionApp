@@ -15,6 +15,7 @@ public class BookChapterEntity implements Serializable{
 	private int updateFlag;
 	private int order;
 	private int isUpdate;
+	private String content;
 	
 	public BookChapterEntity (int _id, String chapterTitle, String chapterUrl, int isRead, int isDownload,
 			int updateFlag, int order, int isUpdate, BookEntity book) {
@@ -99,6 +100,14 @@ public class BookChapterEntity implements Serializable{
 
 	public void setIsUpdate(int isUpdate) {
 		this.isUpdate = isUpdate;
+	}
+
+	public String getContent() {
+		return content;
+	}
+
+	public void setContent(String content) {
+		this.content = content;
 	}
 	
 }

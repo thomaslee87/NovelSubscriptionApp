@@ -2,6 +2,7 @@ package com.novel.subscription;
 
 import java.io.InputStream;
 import java.net.URLDecoder;
+import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Iterator;
 
@@ -9,23 +10,20 @@ import org.apache.http.util.EncodingUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.novel.subscription.R;
-
 import android.app.ActivityGroup;
-import android.content.ContentValues;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.Window;
-import android.widget.Button;
 import android.widget.TabHost;
 
 @SuppressWarnings("deprecation")
@@ -40,29 +38,29 @@ public class MainActivity extends ActivityGroup {
 
 		final AppOptions appOptions = null;// new AppOptions(null);
 		
-		Button btnStart = (Button) findViewById(R.id.btnStart);
-		btnStart.setOnClickListener(new OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				// TODO Auto-generated method stub
-				Intent intent = new Intent(MainActivity.this, UpdateService.class);
-				Bundle bundle = new Bundle();
-				bundle.putSerializable("option", appOptions);
-				intent.putExtras(bundle);
-                startService(intent); //开始服务
-			}
-		});
-		Button btnStop = (Button) findViewById(R.id.btnStop);
-		btnStop.setOnClickListener(new OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				// TODO Auto-generated method stub
-				Intent intent = new Intent(MainActivity.this, UpdateService.class);
-	                stopService(intent);
-	            }
-		});
+//		Button btnStart = (Button) findViewById(R.id.btnStart);
+//		btnStart.setOnClickListener(new OnClickListener() {
+//			
+//			@Override
+//			public void onClick(View v) {
+//				// TODO Auto-generated method stub
+//				Intent intent = new Intent(MainActivity.this, UpdateService.class);
+//				Bundle bundle = new Bundle();
+//				bundle.putSerializable("option", appOptions);
+//				intent.putExtras(bundle);
+//                startService(intent); //开始服务
+//			}
+//		});
+//		Button btnStop = (Button) findViewById(R.id.btnStop);
+//		btnStop.setOnClickListener(new OnClickListener() {
+//			
+//			@Override
+//			public void onClick(View v) {
+//				// TODO Auto-generated method stub
+//				Intent intent = new Intent(MainActivity.this, UpdateService.class);
+//	                stopService(intent);
+//	            }
+//		});
 		
 		
 		Context ctx = MainActivity.this;       
@@ -164,6 +162,22 @@ public class MainActivity extends ActivityGroup {
 		tablehost.addTab(tablehost.newTabSpec("sz").setContent(new Intent(this,SettingActivity.class)).setIndicator(LayoutInflater.from(this).inflate(R.layout.tab_view3,null)));
 		tablehost.addTab(tablehost.newTabSpec("gd").setContent(new Intent(this,MoreActivity.class)).setIndicator(LayoutInflater.from(this).inflate(R.layout.tab_view4,null)));
 		
+//		Context context = getApplicationContext();
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ctx);
+		String intervalString = prefs.getString("updateInterval", "2"); // unit : s ; 2 hours default
+		
+		int interval = 7200;
+		try {
+			interval = Integer.parseInt(intervalString) * 3600;
+		} catch(Exception e) {
+			interval = 7200;
+		}
+		Calendar now = Calendar.getInstance();
+		now.add(Calendar.SECOND, 10);
+		AlarmManager alarmManager = (AlarmManager) ctx.getSystemService(Context.ALARM_SERVICE);
+		Intent i = new Intent(ctx, SchedulerEventReceiver.class); // explicit intent
+		PendingIntent intentExecuted = PendingIntent.getBroadcast(ctx, 0, i, PendingIntent.FLAG_CANCEL_CURRENT);
+		alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, now.getTimeInMillis(), interval * 1000, intentExecuted);
 	}
 
 	@Override

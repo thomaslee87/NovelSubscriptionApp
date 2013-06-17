@@ -91,6 +91,8 @@ public class NovelDB {
 		values.put(CHAPTER_URL, chapter.getChapterUrl());
 		values.put(CHAPTER_ORDER, chapter.getOrder());
 		values.put(CHAPTER_IS_UPDATE, chapter.getIsUpdate());
+		if(chapter.getContent() != null)
+			values.put(CHAPTER_CONTENT, chapter.getContent());
 		
 //		values.put(CHAPTER_CONTENT, "");
 		
