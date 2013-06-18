@@ -28,6 +28,9 @@ import android.widget.TabHost;
 
 @SuppressWarnings("deprecation")
 public class MainActivity extends ActivityGroup {
+	
+	public static final String PUBLISHER_ID = "56OJzYT4uNQdfbLimR";
+	public static final String InlinePPID = "16TLm_IlApcD4NUHVHn_Athk";
     
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

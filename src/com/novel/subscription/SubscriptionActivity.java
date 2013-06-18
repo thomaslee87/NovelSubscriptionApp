@@ -10,8 +10,6 @@ import java.util.Queue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.novel.subscription.R;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentValues;
@@ -34,10 +32,15 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import cn.domob.android.ads.DomobAdEventListener;
+import cn.domob.android.ads.DomobAdManager.ErrorCode;
+import cn.domob.android.ads.DomobAdView;
 
 public class SubscriptionActivity extends Activity {
 	
@@ -227,7 +230,58 @@ public class SubscriptionActivity extends Activity {
 			}
 		});
 		
+		 mAdContainer = (RelativeLayout) findViewById(R.id.adcontainer);
+			// Create ad view
+			mAdview320x50 = new DomobAdView(this, MainActivity.PUBLISHER_ID, MainActivity.InlinePPID, DomobAdView.INLINE_SIZE_320X50);
+			mAdview320x50.setKeyword("game");
+			mAdview320x50.setUserGender("male");
+			mAdview320x50.setUserBirthdayStr("2000-08-08");
+			mAdview320x50.setUserPostcode("123456");
+
+			mAdview320x50.setAdEventListener(new DomobAdEventListener() {
+							
+				@Override
+				public void onDomobAdReturned(DomobAdView adView) {
+					Log.i("DomobSDKDemo", "onDomobAdReturned");				
+				}
+
+				@Override
+				public void onDomobAdOverlayPresented(DomobAdView adView) {
+					Log.i("DomobSDKDemo", "overlayPresented");
+				}
+
+				@Override
+				public void onDomobAdOverlayDismissed(DomobAdView adView) {
+					Log.i("DomobSDKDemo", "Overrided be dismissed");				
+				}
+
+				@Override
+				public void onDomobAdClicked(DomobAdView arg0) {
+					Log.i("DomobSDKDemo", "onDomobAdClicked");				
+				}
+
+				@Override
+				public void onDomobAdFailed(DomobAdView arg0, ErrorCode arg1) {
+					Log.i("DomobSDKDemo", "onDomobAdFailed");				
+				}
+
+				@Override
+				public void onDomobLeaveApplication(DomobAdView arg0) {
+					Log.i("DomobSDKDemo", "onDomobLeaveApplication");				
+				}
+
+				@Override
+				public Context onDomobAdRequiresCurrentContext() {
+					return SubscriptionActivity.this;
+				}
+			});
+			
+			mAdContainer.addView(mAdview320x50);
+		
 	}
+	
+	RelativeLayout mAdContainer;
+	DomobAdView mAdview320x50;
 	
 	private HashMap<Integer, SourceEntity> srcMap = new HashMap<Integer, SourceEntity>();
 	
