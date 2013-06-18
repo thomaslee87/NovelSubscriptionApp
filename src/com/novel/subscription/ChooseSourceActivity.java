@@ -165,7 +165,12 @@ public class ChooseSourceActivity extends ListActivity {
 						db.endTransaction();
 						db.close();
 					}
-					Toast.makeText(ChooseSourceActivity.this, "切换完毕，手动刷新重新加载章节列表。", Toast.LENGTH_SHORT).show();
+					Toast.makeText(ChooseSourceActivity.this, "切换完毕，正在重新加载章节列表。", Toast.LENGTH_SHORT).show();
+					
+					Intent data = new Intent();  
+		            data.putExtra("book_id", subscription.getBookId());  
+		            setResult(20, data);  
+		            
 					finish();
 				}
 			}

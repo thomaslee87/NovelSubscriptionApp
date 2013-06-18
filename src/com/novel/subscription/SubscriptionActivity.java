@@ -18,12 +18,14 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -66,8 +68,16 @@ public class SubscriptionActivity extends Activity {
 			pbCircle.setVisibility(View.VISIBLE);
 			tvRefresh.setVisibility(View.VISIBLE);
 			pgThread = new ProgressThread();
+			
+			Context ctx = getApplicationContext();
+			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ctx);
+			
+			boolean autoDownloadInWifi = prefs.getBoolean("autoDownloadInWifi", true);
+			autoDownloadInWifi = autoDownloadInWifi && (TestNetworkStatus() == ConnectivityManager.TYPE_WIFI);
+			
 			pgThread.isRunning = true;
 			pgThread.position = position;
+			pgThread.autoDownloadInWifi = autoDownloadInWifi;
 			pgThread.start();
 		}
 	}
@@ -135,7 +145,7 @@ public class SubscriptionActivity extends Activity {
 			public boolean onItemLongClick(AdapterView<?> adapter, View view, final int pos, long id) {
 				
 				final SubscriptionEntity subscription = (SubscriptionEntity)(adapter.getItemAtPosition(pos));
-				final String[] arrayFruit = new String[] {"立即刷新", "选择其他源", "取消订阅"};
+				final String[] arrayFruit = new String[] {"立即刷新", "重新加载章节列表", "选择其他源", "取消订阅"};
 				new AlertDialog.Builder(SubscriptionActivity.this)
 	              .setTitle("订阅管理")
 	              .setIcon(R.drawable.ic_launcher)
@@ -146,13 +156,16 @@ public class SubscriptionActivity extends Activity {
 			        		 refresh(pos);
 			        	 }
 			        	 else if(which == 1) {
+			        		 
+			        	 }
+			        	 else if(which == 2) {
 			        		Intent intent = new Intent(SubscriptionActivity.this, ChooseSourceActivity.class);
 			 				Bundle bundle = new Bundle();
 			 				bundle.putSerializable("subscription", subscription);
 			 				intent.putExtras(bundle);
-			 				startActivity(intent);
+			 				startActivityForResult(intent, 100);
 			        	 }
-			        	 else if(which == 2){
+			        	 else if(which == 3){
 			        		 new AlertDialog.Builder(SubscriptionActivity.this)
 			 			 	.setTitle("取消订阅")
 			 			 	.setMessage("您打算取消订阅  " +  subscription.getBook().getName() + " 吗?")
@@ -217,6 +230,22 @@ public class SubscriptionActivity extends Activity {
 		if(adapter != null)
 			adapter.notifyDataSetChanged();
 	}
+	
+	@Override  
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)  
+    {  
+        if(20 == resultCode)  
+        {  
+        	int book_id = data.getExtras().getInt("book_id");
+        	for(int i = 0; i < items.size(); i ++) {
+        		if(book_id == items.get(i).getBookId()) {
+        			refresh(i);
+        			break;
+        		}
+        	}
+        }  
+        super.onActivityResult(requestCode, resultCode, data);  
+    }  
 
 	public HashSet<String> curBookList = new HashSet<String>();
 
@@ -355,6 +384,7 @@ public class SubscriptionActivity extends Activity {
 								values.put(NovelDB.SRC_ID, 1);
 								values.put(NovelDB.BOOK_URL, bookUrl);
 								values.put(NovelDB.TYPE_ID, 0);
+								values.put(NovelDB.BOOK_SITE, bookSite);
 								long _id = db.insert(NovelDB.BOOK_LIST_TABLE, null, values);  
 								
 								BookEntity book = new BookEntity(_id, bookName, "", bookUrl, bookUpdate, 0, bookSite, srcMap.get(1));
@@ -463,7 +493,8 @@ public class SubscriptionActivity extends Activity {
     {
     	public boolean isRunning;
     	public int position;
-
+    	public boolean autoDownloadInWifi;
+    	
         @Override
         public void run()
         {
@@ -524,6 +555,7 @@ public class SubscriptionActivity extends Activity {
 	        		Matcher mBody = pBody.matcher(res);
 	    			String url = "";
 	    			String title = "";
+	    			int chapterOrder = 0;
 	    			String lastUrl, lastTitle;
 	        		if(mBody.find()) {
 	        			String body = mBody.group(1);
@@ -543,7 +575,7 @@ public class SubscriptionActivity extends Activity {
 	            				continue;
 	            			Matcher mUrlOrder = pOrder.matcher(url);
 	            			if(mUrlOrder.find()) {
-	            				int chapterOrder = 0;
+	            				chapterOrder = 0;
 	            				try {
 	            					chapterOrder = Integer.parseInt(mUrlOrder.group(1));
 	            				}catch (Exception e) {
@@ -552,8 +584,12 @@ public class SubscriptionActivity extends Activity {
 	            					title = lastTitle;
 	            					continue;
 	            				}
-	            				if(chapterOrder > book.getUpdateOrder())
-	            					chapterQueue.add(new BookChapterEntity(-1, title, url, 0, 0, 0, chapterOrder, 1, book));
+	            				if(chapterOrder > book.getUpdateOrder()) {
+	            					BookChapterEntity bookChapter = new BookChapterEntity(-1, title, url, 0, 0, 0, chapterOrder, 1, book);
+	            					if(book.getUpdateOrder() != 0 && autoDownloadInWifi)
+	            						bookChapter.setContent(readChapterContent(bookChapter));
+	            					chapterQueue.add(bookChapter);
+	            				}
 	            				else 
 	            					fetchPageNum = 0; // 到了上次更新的地方，说明读完本页就可以结束循环了
 	            			}
@@ -563,6 +599,10 @@ public class SubscriptionActivity extends Activity {
 	            			values.put(NovelDB.SUBSCRIPTION_LATEST_TITLE, title);
 	            			values.put(NovelDB.SUBSCRIPTION_LATEST_URL, url);
 	            			db.update(NovelDB.SUBSCRIPTION_TABLE, values, "_id = " + subscription.getId(), null);
+	            			
+	            			ContentValues bkValues = new ContentValues();
+	            			bkValues.put(NovelDB.BOOK_UPDATE_ORDER, chapterOrder);
+	            			db.update(NovelDB.BOOK_LIST_TABLE, bkValues, "_id=" + subscription.getBook().getPriId(), null);
 	            		}
 	        		}
 	        		if(totalPage == 0) {
@@ -604,6 +644,42 @@ public class SubscriptionActivity extends Activity {
 	        		
         	isRunning = false;
         	handler.sendEmptyMessage(FINISHED_CODE);
+        }
+        
+        public String readChapterContent(BookChapterEntity bookChapter) {
+        	String domain = bookChapter.getBook().getSrcEntity().getDomain();
+        	Pattern pContent = Pattern.compile(bookChapter.getBook().getSrcEntity().getPatternContent());
+        	String chapterUrl = bookChapter.getChapterUrl();
+        	
+        	String res = HtmlService.getHtmlByGet(domain + chapterUrl);
+        	
+        	int page = 1;
+    		Pattern pPage = Pattern.compile("tc_next[\\s\\S]*?href[\\s\\S]*?=[\\s\\S]*?<span[\\s\\S]*?>(\\d+?)</span>/(\\d+?)[^\\d]");
+    		Matcher m = pPage.matcher(res);
+    		if(m.find()) {
+    			try {
+    				page = Integer.parseInt(m.group(2));
+    			} catch(Exception e) {
+    				page = 1;
+    			}
+    		}
+        	
+    		int i = 1;
+    		StringBuilder sb = new StringBuilder(65536);
+    		while(i <= page) {
+	    		m = pContent.matcher(res);
+	    		if(m.find()) {
+	    			String content = m.group(1);
+	    			for(String invalidContent: ConstDefinition.INVALID_CONTENT)
+	    				content = content.replaceAll(invalidContent, "");
+	    			sb.append(content);
+	    		}
+	    		i ++;
+	    		if(i > page)
+	    			break;
+	    		res = HtmlService.getHtmlByGet(domain + chapterUrl + "&pi=" + i);
+    		}
+        	return sb.toString();
         }
     }
     

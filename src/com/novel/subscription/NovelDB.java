@@ -81,9 +81,9 @@ public class NovelDB {
 			cursor.close();
 		}
 		
-		ContentValues bkValues = new ContentValues();
-		bkValues.put(BOOK_UPDATE_ORDER, chapter.getOrder());
-		database.update(BOOK_LIST_TABLE, bkValues, "_id=" + chapter.getBook().getPriId(), null);
+//		ContentValues bkValues = new ContentValues();
+//		bkValues.put(BOOK_UPDATE_ORDER, chapter.getOrder());
+//		database.update(BOOK_LIST_TABLE, bkValues, "_id=" + chapter.getBook().getPriId(), null);
 		
 		ContentValues values = new ContentValues();
 		values.put(CHAPTER_BOOK_ID, chapter.getBook().getPriId());
