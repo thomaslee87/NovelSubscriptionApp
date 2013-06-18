@@ -60,8 +60,8 @@ public class SubscriptionListViewAdapter extends BaseAdapter {
         else
         	pb.setVisibility(View.GONE);
         
-        if(!subscriptionEntity.getReadUrl().equals(subscriptionEntity.getLatestUrl()))
-        	tvTitle.setBackgroundColor(Color.argb(0x80, 0xFF, 0xCC, 0));
+//        if(!subscriptionEntity.getReadUrl().equals(subscriptionEntity.getLatestUrl()))
+//        	tvTitle.setBackgroundColor(Color.argb(0x80, 0xFF, 0xCC, 0));
         
         return view;
     }

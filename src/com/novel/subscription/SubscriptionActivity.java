@@ -156,7 +156,7 @@ public class SubscriptionActivity extends Activity {
 			        		 refresh(pos);
 			        	 }
 			        	 else if(which == 1) {
-			        		 subscription.getBook().setUpdateOrder(0);
+			        		 items.get(pos).getBook().setUpdateOrder(0);
 			        		 refresh(pos);
 			        	 }
 			        	 else if(which == 2) {
@@ -209,6 +209,16 @@ public class SubscriptionActivity extends Activity {
 			
 			@Override
 			public void onClick(View v) {
+				if(TestNetworkStatus() == -1) {
+					tvNet.setVisibility(View.VISIBLE);
+					tvRefresh.setVisibility(View.GONE);
+					pbCircle.setVisibility(View.GONE);
+					return;
+				}
+				else {
+					tvNet.setVisibility(View.GONE);
+				}
+				
 				searchThread = new SearchThread();
 				searchThread.sKeyWord = etSearchName.getText().toString();
 				btnSearch.setEnabled(false);
@@ -240,12 +250,13 @@ public class SubscriptionActivity extends Activity {
         	int book_id = data.getExtras().getInt("book_id");
         	for(int i = 0; i < items.size(); i ++) {
         		if(book_id == items.get(i).getBookId()) {
+        			items.get(i).getBook().setUpdateOrder(0);
         			refresh(i);
         			break;
         		}
         	}
         }  
-        super.onActivityResult(requestCode, resultCode, data);  
+//        super.onActivityResult(requestCode, resultCode, data);  
     }  
 
 	public HashSet<String> curBookList = new HashSet<String>();
@@ -378,7 +389,7 @@ public class SubscriptionActivity extends Activity {
 						public void onClick(DialogInterface dialog, int which) {
 							boolean flag = true;
 							NovelDB db = new NovelDB(getApplicationContext());
-							
+							long _id = -1;
 							try {
 								ContentValues values = new ContentValues();  
 								values.put(NovelDB.BOOK_NAME, bookName);
@@ -386,7 +397,7 @@ public class SubscriptionActivity extends Activity {
 								values.put(NovelDB.BOOK_URL, bookUrl);
 								values.put(NovelDB.TYPE_ID, 0);
 								values.put(NovelDB.BOOK_SITE, bookSite);
-								long _id = db.insert(NovelDB.BOOK_LIST_TABLE, null, values);  
+								_id = db.insert(NovelDB.BOOK_LIST_TABLE, null, values);  
 								
 								BookEntity book = new BookEntity(_id, bookName, "", bookUrl, bookUpdate, 0, bookSite, srcMap.get(1));
 								if(book.getLatestTitle() == null)
@@ -401,6 +412,13 @@ public class SubscriptionActivity extends Activity {
 							}
 							
 							showSubscription();
+							for(int i = 0; i < items.size(); i ++) {
+				        		if(_id == items.get(i).getBookId()) {
+				        			items.get(i).getBook().setUpdateOrder(0);
+				        			refresh(i);
+				        			break;
+				        		}
+				        	}
 						}
 					})
 				 	.setNegativeButton("È¡Ïû", null).show();
