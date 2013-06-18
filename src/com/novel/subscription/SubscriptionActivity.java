@@ -156,7 +156,8 @@ public class SubscriptionActivity extends Activity {
 			        		 refresh(pos);
 			        	 }
 			        	 else if(which == 1) {
-			        		 
+			        		 subscription.getBook().setUpdateOrder(0);
+			        		 refresh(pos);
 			        	 }
 			        	 else if(which == 2) {
 			        		Intent intent = new Intent(SubscriptionActivity.this, ChooseSourceActivity.class);
