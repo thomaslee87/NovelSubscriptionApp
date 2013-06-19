@@ -1,13 +1,20 @@
 package com.novel.subscription;
 
+import java.util.Calendar;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import cn.domob.android.ads.DomobAdEventListener;
+import cn.domob.android.ads.DomobAdView;
+import cn.domob.android.ads.DomobAdManager.ErrorCode;
 
 import com.novel.subscription.R;
 
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -16,6 +23,8 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
@@ -23,6 +32,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 public class BookReaderActivity extends Activity {
@@ -69,11 +79,92 @@ public class BookReaderActivity extends Activity {
 		});
 		
 		showChapterContent(true);
+		
+		mAdContainer = (RelativeLayout) findViewById(R.id.adcontainer2);
+		
+		Calendar now = Calendar.getInstance();
+		int hour = now.get(Calendar.HOUR_OF_DAY);
+		// Create ad view
+		mAdview320x50 = new DomobAdView(this, MainActivity.PUBLISHER_ID, MainActivity.InlinePPID, DomobAdView.INLINE_SIZE_320X50);
+		if(hour >= 20)
+			mAdview320x50.setKeyword("game");
+//				mAdview320x50.setUserGender("male");
+//				mAdview320x50.setUserBirthdayStr("2000-08-08");
+//				mAdview320x50.setUserPostcode("123456");
+
+		mAdview320x50.setAdEventListener(new DomobAdEventListener() {
+						
+			@Override
+			public void onDomobAdReturned(DomobAdView adView) {
+				Log.i("DomobSDKDemo", "onDomobAdReturned");				
+			}
+
+			@Override
+			public void onDomobAdOverlayPresented(DomobAdView adView) {
+				Log.i("DomobSDKDemo", "overlayPresented");
+			}
+
+			@Override
+			public void onDomobAdOverlayDismissed(DomobAdView adView) {
+				Log.i("DomobSDKDemo", "Overrided be dismissed");			
+				
+				Calendar now = Calendar.getInstance();
+		    	now.set(Calendar.HOUR_OF_DAY, 0);
+		    	now.set(Calendar.MINUTE, 0);
+		    	now.set(Calendar.SECOND, 0);
+				
+				Context ctx = getApplicationContext();
+				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ctx);
+				
+		   		Editor editor = prefs.edit();
+				editor.putLong(ConstDefinition.LAST_CLK_AD_TIME, now.getTimeInMillis());
+				editor.commit();
+				
+				mAdContainer.setVisibility(View.GONE);
+			}
+
+			@Override
+			public void onDomobAdClicked(DomobAdView arg0) {
+				Log.i("DomobSDKDemo", "onDomobAdClicked");				
+			}
+
+			@Override
+			public void onDomobAdFailed(DomobAdView arg0, ErrorCode arg1) {
+				Log.i("DomobSDKDemo", "onDomobAdFailed");				
+			}
+
+			@Override
+			public void onDomobLeaveApplication(DomobAdView arg0) {
+				Log.i("DomobSDKDemo", "onDomobLeaveApplication");				
+			}
+
+			@Override
+			public Context onDomobAdRequiresCurrentContext() {
+				return BookReaderActivity.this;
+			}
+		});
+		
+		mAdContainer.addView(mAdview320x50);
+		
 	}
+			
+	RelativeLayout mAdContainer;
+	DomobAdView mAdview320x50;
 	
 	@Override
 	protected void onResume() {
 		super.onResume();
+		
+		Calendar now = Calendar.getInstance();
+		Context ctx = getApplicationContext();
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ctx);
+		long lastClkAdTime = prefs.getLong(ConstDefinition.LAST_CLK_AD_TIME, 0);
+		if(now.getTimeInMillis() - lastClkAdTime < 86400 * 1000) {
+			mAdContainer.setVisibility(View.GONE);
+		}
+		else {
+			mAdContainer.setVisibility(View.VISIBLE);
+		}
 //		showChapterContent(true);
 	}
 	

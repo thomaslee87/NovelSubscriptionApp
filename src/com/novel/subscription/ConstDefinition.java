@@ -16,5 +16,7 @@ public class ConstDefinition {
 	public static final String JSON_LIST_KEY = "list";
 	
 	public static final String KEY_VERSION = "version";
+	public static final String LAST_CLK_AD_TIME = "lastClickAdTime";
+	
 	public static final int CURRENT_VERSION = 1;
 }
