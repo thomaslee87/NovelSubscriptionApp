@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Queue;
-import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -35,7 +34,6 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -233,6 +231,8 @@ public class SubscriptionActivity extends Activity {
 			}
 		});
 		
+		showSubscription();
+		
 		mAdContainer = (RelativeLayout) findViewById(R.id.adcontainer);
 		
 		Calendar now = Calendar.getInstance();
@@ -313,7 +313,8 @@ public class SubscriptionActivity extends Activity {
 	protected void onResume() {
 		// TODO Auto-generated method stub
 		super.onResume();
-		showSubscription();
+		
+//		showSubscription();
 		if(adapter != null)
 			adapter.notifyDataSetChanged();
 		
@@ -332,7 +333,7 @@ public class SubscriptionActivity extends Activity {
 	@Override  
     protected void onActivityResult(int requestCode, int resultCode, Intent data)  
     {  
-        if(20 == resultCode)  
+        if(100 == requestCode && 20 == resultCode)  
         {  
         	int book_id = data.getExtras().getInt("book_id");
         	for(int i = 0; i < items.size(); i ++) {
@@ -612,6 +613,7 @@ public class SubscriptionActivity extends Activity {
         	boolean needUpdateDb = true;//false;
         	int curPage = 0, totalPage = 0;
         	int fetchPageNum = -1;
+        	Log.i("test", items.size() + " size");
         	for(int i = 0; i < items.size(); i ++) {
 
         		if(position != -1 && i != position)
@@ -627,6 +629,7 @@ public class SubscriptionActivity extends Activity {
         	
         		SubscriptionEntity subscription = items.get(i);
         		BookEntity book = subscription.getBook();
+        		Log.i("test", book.getName() + " updateOrder: " + book.getUpdateOrder());
         		
         		fetchPageNum = -1;
         		curPage = 0;
@@ -733,7 +736,8 @@ public class SubscriptionActivity extends Activity {
         		handler.sendMessage(msg);
         	}
         	
-        	if(needUpdateDb) {
+        	if(needUpdateDb && !chapterQueue.isEmpty()) {
+        		Log.i("com.novel.subscription", "subscription needUpdateDatabase");
         		db.beginTransaction();
 		        try {
 		        	while(!chapterQueue.isEmpty()) 

@@ -14,6 +14,7 @@ import android.util.Log;
 public class HtmlService {
 
 	public static String getHtmlByGet(String _url){
+		Log.i("com.novel.subscription", "get: " + _url);
 		String result = "";
 		HttpClient client = new DefaultHttpClient();
 		HttpClientParams.setCookiePolicy(client.getParams(), CookiePolicy.BROWSER_COMPATIBILITY);   // ·ÀÖ¹±¨invalid cookie headerµÄ´í
