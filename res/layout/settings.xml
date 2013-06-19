@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>  
+<PreferenceScreen  
+	xmlns:android="http://schemas.android.com/apk/res/android">  
+	
+	<PreferenceCategory android:title="更新设置">  
+		<CheckBoxPreference  
+			android:key="autoUpdate"  
+			android:title="自动更新"  
+			android:summaryOn="开启"  
+			android:summaryOff="关闭"  
+			android:defaultValue="true"  
+		/>  
+		<ListPreference  
+			android:key="updateInterval"  
+			android:title="更新频率"  
+			android:summary=""  
+			android:dialogTitle="更新频率"  
+			android:entries="@array/update_interval"  
+			android:entryValues="@array/update_interval_values"  
+			/>  
+	 </PreferenceCategory>
+	  
+	<PreferenceCategory android:title="提醒设置">  
+		<CheckBoxPreference  
+			android:key="updateNotify"  
+			android:title="有更新时是否通知"  
+			android:summaryOn="开启"  
+			android:summaryOff="关闭"  
+			android:defaultValue="true"  
+		/>  
+		<CheckBoxPreference  
+			android:key="notifySound"  
+			android:title="声音通知"  
+			android:summaryOn="开启"  
+			android:summaryOff="关闭"  
+			android:defaultValue="true"  
+		/> 
+		<CheckBoxPreference  
+			android:key="notifyVibrate"  
+			android:title="振动通知"  
+			android:summaryOn="开启"  
+			android:summaryOff="关闭"  
+			android:defaultValue="true"  
+		/> 
+		
+		<!-- PreferenceScreen android:title="更多选项">  
+			<CheckBoxPreference  
+			android:key="cb21"  
+			android:title="功能1"  
+			android:summaryOn="开启"  
+			android:summaryOff="关闭"  
+			android:defaultValue="true"  
+			/>  
+			<CheckBoxPreference  
+			android:key="cb22"  
+			android:title="功能2"  
+			android:summaryOn="使用"  
+			android:summaryOff="停用"  
+			android:defaultValue="true"  
+			/>  
+			
+			<EditTextPreference  
+			android:key="et1"  
+			android:title="EditTextPreference Sample"  
+			android:summary="点击输入"  
+			android:dialogTitle="输入设置"  
+			android:defaultValue="Hello EditTextPreference"  
+			/>  
+		</PreferenceScreen>  --> 
+	</PreferenceCategory>  
+	  
+	<PreferenceCategory android:title="功能选项">  
+	    <CheckBoxPreference  
+			android:key="autoDownloadInWifi"  
+			android:title="有更新时自动下载（仅在wifi下有效）"  
+			android:summaryOn="开启"  
+			android:summaryOff="关闭"  
+			android:defaultValue="true"  
+		/> 
+		<CheckBoxPreference  
+			android:key="lowCostMode"  
+			android:title="省流量模式（23:00~7:00不更新）"  
+			android:summaryOn="开启"  
+			android:summaryOff="关闭"  
+			android:defaultValue="true"  
+		/> 
+	</PreferenceCategory>  
+</PreferenceScreen> 
