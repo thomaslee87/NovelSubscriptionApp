@@ -6,6 +6,8 @@ import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Iterator;
 
+import net.youmi.android.AdManager;
+
 import org.apache.http.util.EncodingUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -29,8 +31,8 @@ import android.widget.TabHost;
 @SuppressWarnings("deprecation")
 public class MainActivity extends ActivityGroup {
 	
-	public static final String PUBLISHER_ID = "56OJzYT4uNQdfbLimR";
-	public static final String InlinePPID = "16TLm_IlApcD4NUHVHn_Athk";
+	public static final String PUBLISHER_ID = "56OJzYT4uNQKns3xwL";
+	public static final String InlinePPID = "16TLm_IlApcTwNUHb4Wb5Hwk";
     
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +40,9 @@ public class MainActivity extends ActivityGroup {
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		
 		setContentView(R.layout.activity_main);
+		
+		AdManager.getInstance(this).init("a0659380b6ce6b1b",
+				"e9558d8cbbc1c11f", false);
 
 		final AppOptions appOptions = null;// new AppOptions(null);
 		

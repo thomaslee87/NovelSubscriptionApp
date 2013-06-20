@@ -11,6 +11,9 @@ import java.util.Queue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.youmi.android.banner.AdSize;
+import net.youmi.android.banner.AdView;
+import net.youmi.android.banner.AdViewLinstener;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentValues;
@@ -236,68 +239,94 @@ public class SubscriptionActivity extends Activity {
 		Calendar now = Calendar.getInstance();
 		int hour = now.get(Calendar.HOUR_OF_DAY);
 		
-		// Create ad view
-		mAdview320x50 = new DomobAdView(this, MainActivity.PUBLISHER_ID, MainActivity.InlinePPID, DomobAdView.INLINE_SIZE_320X50);
-		if(hour >= 20)
-			mAdview320x50.setKeyword("game");
-//		mAdview320x50.setUserGender("male");
-//		mAdview320x50.setUserBirthdayStr("2000-08-08");
-//		mAdview320x50.setUserPostcode("123456");
+		long timeRandom = now.getTimeInMillis() / 1000;
+		if(timeRandom % 2 == 0) {
+			AdView youmiAdView = new AdView(this, AdSize.SIZE_320x50);
+	        mAdContainer.addView(youmiAdView);
 
-		mAdview320x50.setAdEventListener(new DomobAdEventListener() {
-						
-			@Override
-			public void onDomobAdReturned(DomobAdView adView) {
-				Log.i("DomobSDKDemo", "onDomobAdReturned");				
-			}
-
-			@Override
-			public void onDomobAdOverlayPresented(DomobAdView adView) {
-				Log.i("DomobSDKDemo", "overlayPresented");
-			}
-
-			@Override
-			public void onDomobAdOverlayDismissed(DomobAdView adView) {
-				Log.i("DomobSDKDemo", "Overrided be dismissed");			
-				
-				Calendar now = Calendar.getInstance();
-		    	now.set(Calendar.HOUR_OF_DAY, 0);
-		    	now.set(Calendar.MINUTE, 0);
-		    	now.set(Calendar.SECOND, 0);
-				
-				Context ctx = getApplicationContext();
-				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ctx);
-				
-		   		Editor editor = prefs.edit();
-				editor.putLong(ConstDefinition.LAST_CLK_AD_TIME, now.getTimeInMillis());
-				editor.commit();
-				
-				mAdContainer.setVisibility(View.GONE);
-			}
-
-			@Override
-			public void onDomobAdClicked(DomobAdView arg0) {
-				Log.i("DomobSDKDemo", "onDomobAdClicked");				
-			}
-
-			@Override
-			public void onDomobAdFailed(DomobAdView arg0, ErrorCode arg1) {
-				Log.i("DomobSDKDemo", "onDomobAdFailed");				
-			}
-
-			@Override
-			public void onDomobLeaveApplication(DomobAdView arg0) {
-				Log.i("DomobSDKDemo", "onDomobLeaveApplication");				
-			}
-
-			@Override
-			public Context onDomobAdRequiresCurrentContext() {
-				return SubscriptionActivity.this;
-			}
-		});
-		
-		mAdContainer.addView(mAdview320x50);
-		
+	        // 监听广告条接口
+	        youmiAdView.setAdListener(new AdViewLinstener() {
+	            
+	            @Override
+	            public void onSwitchedAd(AdView arg0) {
+	                Log.i("YoumiSample", "广告条切换");
+	            }
+	            
+	            @Override
+	            public void onReceivedAd(AdView arg0) {
+	                Log.i("YoumiSample", "请求广告成功");
+	                
+	            }
+	            
+	            @Override
+	            public void onFailedToReceivedAd(AdView arg0) {
+	                Log.i("YoumiSample", "请求广告失败");
+	            }
+	        });
+		}
+		else {
+			// Create ad view
+			mAdview320x50 = new DomobAdView(this, MainActivity.PUBLISHER_ID, MainActivity.InlinePPID, DomobAdView.INLINE_SIZE_320X50);
+			if(hour >= 20)
+				mAdview320x50.setKeyword("game");
+	//		mAdview320x50.setUserGender("male");
+	//		mAdview320x50.setUserBirthdayStr("2000-08-08");
+	//		mAdview320x50.setUserPostcode("123456");
+	
+			mAdview320x50.setAdEventListener(new DomobAdEventListener() {
+							
+				@Override
+				public void onDomobAdReturned(DomobAdView adView) {
+					Log.i("DomobSDKDemo", "onDomobAdReturned");				
+				}
+	
+				@Override
+				public void onDomobAdOverlayPresented(DomobAdView adView) {
+					Log.i("DomobSDKDemo", "overlayPresented");
+				}
+	
+				@Override
+				public void onDomobAdOverlayDismissed(DomobAdView adView) {
+					Log.i("DomobSDKDemo", "Overrided be dismissed");			
+					
+					Calendar now = Calendar.getInstance();
+			    	now.set(Calendar.HOUR_OF_DAY, 0);
+			    	now.set(Calendar.MINUTE, 0);
+			    	now.set(Calendar.SECOND, 0);
+					
+					Context ctx = getApplicationContext();
+					SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ctx);
+					
+			   		Editor editor = prefs.edit();
+					editor.putLong(ConstDefinition.LAST_CLK_AD_TIME, now.getTimeInMillis());
+					editor.commit();
+					
+	//				mAdContainer.setVisibility(View.GONE);
+				}
+	
+				@Override
+				public void onDomobAdClicked(DomobAdView arg0) {
+					Log.i("DomobSDKDemo", "onDomobAdClicked");				
+				}
+	
+				@Override
+				public void onDomobAdFailed(DomobAdView arg0, ErrorCode arg1) {
+					Log.i("DomobSDKDemo", "onDomobAdFailed");				
+				}
+	
+				@Override
+				public void onDomobLeaveApplication(DomobAdView arg0) {
+					Log.i("DomobSDKDemo", "onDomobLeaveApplication");				
+				}
+	
+				@Override
+				public Context onDomobAdRequiresCurrentContext() {
+					return SubscriptionActivity.this;
+				}
+			});
+			
+			mAdContainer.addView(mAdview320x50);
+		}
 	}
 	
 	RelativeLayout mAdContainer;
@@ -332,10 +361,10 @@ public class SubscriptionActivity extends Activity {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ctx);
 		long lastClkAdTime = prefs.getLong(ConstDefinition.LAST_CLK_AD_TIME, 0);
 		if(now.getTimeInMillis() - lastClkAdTime < 86400 * 1000) {
-			mAdContainer.setVisibility(View.GONE);
+//			mAdContainer.setVisibility(View.GONE);
 		}
 		else {
-			mAdContainer.setVisibility(View.VISIBLE);
+//			mAdContainer.setVisibility(View.VISIBLE);
 		}
 	}
 	
