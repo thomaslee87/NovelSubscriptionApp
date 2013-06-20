@@ -4,22 +4,15 @@ import java.util.Calendar;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import cn.domob.android.ads.DomobAdEventListener;
-import cn.domob.android.ads.DomobAdView;
-import cn.domob.android.ads.DomobAdManager.ErrorCode;
-
-import com.novel.subscription.R;
-
+import net.youmi.android.banner.AdSize;
+import net.youmi.android.banner.AdView;
+import net.youmi.android.banner.AdViewLinstener;
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -34,6 +27,9 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import cn.domob.android.ads.DomobAdEventListener;
+import cn.domob.android.ads.DomobAdManager.ErrorCode;
+import cn.domob.android.ads.DomobAdView;
 
 public class BookReaderActivity extends Activity {
 	
@@ -84,67 +80,117 @@ public class BookReaderActivity extends Activity {
 		
 		Calendar now = Calendar.getInstance();
 		int hour = now.get(Calendar.HOUR_OF_DAY);
-		// Create ad view
-		mAdview320x50 = new DomobAdView(this, MainActivity.PUBLISHER_ID, MainActivity.InlinePPID, DomobAdView.INLINE_SIZE_320X50);
-		if(hour >= 20)
-			mAdview320x50.setKeyword("game");
-//				mAdview320x50.setUserGender("male");
-//				mAdview320x50.setUserBirthdayStr("2000-08-08");
-//				mAdview320x50.setUserPostcode("123456");
+		long timeRandom = now.getTimeInMillis() / 1000;
+		if(true) {//timeRandom % 2 == 0) {
+			AdView youmiAdView = new AdView(this, AdSize.SIZE_320x50);
+	        mAdContainer.addView(youmiAdView);
 
-		mAdview320x50.setAdEventListener(new DomobAdEventListener() {
-						
-			@Override
-			public void onDomobAdReturned(DomobAdView adView) {
-				Log.i("DomobSDKDemo", "onDomobAdReturned");				
-			}
-
-			@Override
-			public void onDomobAdOverlayPresented(DomobAdView adView) {
-				Log.i("DomobSDKDemo", "overlayPresented");
-			}
-
-			@Override
-			public void onDomobAdOverlayDismissed(DomobAdView adView) {
-				Log.i("DomobSDKDemo", "Overrided be dismissed");			
+	        // 监听广告条接口
+	        youmiAdView.setAdListener(new AdViewLinstener() {
+	        	
+	            @Override
+	            public void onSwitchedAd(AdView arg0) {
+	                Log.i("YoumiSample", "广告条切换");
+	            }
+	            
+	            @Override
+	            public void onReceivedAd(AdView arg0) {
+	                Log.i("YoumiSample", "请求广告成功");
+	                
+	            }
+	            
+	            @Override
+	            public void onFailedToReceivedAd(AdView arg0) {
+	                Log.i("YoumiSample", "请求广告失败");
+	            }
+	            
+	        });
+	        
+	        youmiAdView.setOnClickListener(new OnClickListener() {
 				
-				Calendar now = Calendar.getInstance();
-		    	now.set(Calendar.HOUR_OF_DAY, 0);
-		    	now.set(Calendar.MINUTE, 0);
-		    	now.set(Calendar.SECOND, 0);
-				
-				Context ctx = getApplicationContext();
-				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ctx);
-				
-		   		Editor editor = prefs.edit();
-				editor.putLong(ConstDefinition.LAST_CLK_AD_TIME, now.getTimeInMillis());
-				editor.commit();
-				
-				mAdContainer.setVisibility(View.GONE);
-			}
-
-			@Override
-			public void onDomobAdClicked(DomobAdView arg0) {
-				Log.i("DomobSDKDemo", "onDomobAdClicked");				
-			}
-
-			@Override
-			public void onDomobAdFailed(DomobAdView arg0, ErrorCode arg1) {
-				Log.i("DomobSDKDemo", "onDomobAdFailed");				
-			}
-
-			@Override
-			public void onDomobLeaveApplication(DomobAdView arg0) {
-				Log.i("DomobSDKDemo", "onDomobLeaveApplication");				
-			}
-
-			@Override
-			public Context onDomobAdRequiresCurrentContext() {
-				return BookReaderActivity.this;
-			}
-		});
-		
-		mAdContainer.addView(mAdview320x50);
+				@Override
+				public void onClick(View v) {
+					// TODO Auto-generated method stub
+					Log.d("com.novel.subscription", "click ad");
+					Calendar now = Calendar.getInstance();
+			    	now.set(Calendar.HOUR_OF_DAY, 0);
+			    	now.set(Calendar.MINUTE, 0);
+			    	now.set(Calendar.SECOND, 0);
+					
+					Context ctx = getApplicationContext();
+					SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ctx);
+					
+			   		Editor editor = prefs.edit();
+					editor.putLong(ConstDefinition.LAST_CLK_AD_TIME, now.getTimeInMillis());
+					editor.commit();
+					
+					mAdContainer.setVisibility(View.GONE);
+				}
+			});
+		}
+		else {
+			// Create ad view
+			mAdview320x50 = new DomobAdView(this, MainActivity.PUBLISHER_ID, MainActivity.InlinePPID, DomobAdView.INLINE_SIZE_320X50);
+			if(hour >= 20)
+				mAdview320x50.setKeyword("game");
+	//		mAdview320x50.setUserGender("male");
+	//		mAdview320x50.setUserBirthdayStr("2000-08-08");
+	//		mAdview320x50.setUserPostcode("123456");
+	
+			mAdview320x50.setAdEventListener(new DomobAdEventListener() {
+							
+				@Override
+				public void onDomobAdReturned(DomobAdView adView) {
+					Log.i("DomobSDKDemo", "onDomobAdReturned");				
+				}
+	
+				@Override
+				public void onDomobAdOverlayPresented(DomobAdView adView) {
+					Log.i("DomobSDKDemo", "overlayPresented");
+				}
+	
+				@Override
+				public void onDomobAdOverlayDismissed(DomobAdView adView) {
+					Log.i("DomobSDKDemo", "Overrided be dismissed");			
+					
+					Calendar now = Calendar.getInstance();
+			    	now.set(Calendar.HOUR_OF_DAY, 0);
+			    	now.set(Calendar.MINUTE, 0);
+			    	now.set(Calendar.SECOND, 0);
+					
+					Context ctx = getApplicationContext();
+					SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ctx);
+					
+			   		Editor editor = prefs.edit();
+					editor.putLong(ConstDefinition.LAST_CLK_AD_TIME, now.getTimeInMillis());
+					editor.commit();
+					
+	//				mAdContainer.setVisibility(View.GONE);
+				}
+	
+				@Override
+				public void onDomobAdClicked(DomobAdView arg0) {
+					Log.i("DomobSDKDemo", "onDomobAdClicked");				
+				}
+	
+				@Override
+				public void onDomobAdFailed(DomobAdView arg0, ErrorCode arg1) {
+					Log.i("DomobSDKDemo", "onDomobAdFailed");				
+				}
+	
+				@Override
+				public void onDomobLeaveApplication(DomobAdView arg0) {
+					Log.i("DomobSDKDemo", "onDomobLeaveApplication");				
+				}
+	
+				@Override
+				public Context onDomobAdRequiresCurrentContext() {
+					return BookReaderActivity.this;
+				}
+			});
+			
+			mAdContainer.addView(mAdview320x50);
+		}
 		
 	}
 			
@@ -196,7 +242,7 @@ public class BookReaderActivity extends Activity {
 				String chapterContent = cursor.getString(8);
 				if(chapterContent != null) {
 					lyLoading.setVisibility(View.GONE); 
-					chapterContent = "<html><body bgcolor=\"#999999\" >" + chapterContent + "</body></html>";
+					chapterContent = "<html><body bgcolor=\"#999999\" >" + chapterContent + "<br/><br/><br/><br/><br/></body></html>";
 					wvBookDisplayer.loadData(chapterContent, "text/html; charset=UTF-8", null);
 				}
 				else if(needLoad){

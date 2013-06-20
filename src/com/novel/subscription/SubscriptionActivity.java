@@ -240,7 +240,7 @@ public class SubscriptionActivity extends Activity {
 		int hour = now.get(Calendar.HOUR_OF_DAY);
 		
 		long timeRandom = now.getTimeInMillis() / 1000;
-		if(timeRandom % 2 == 0) {
+		if(true){//timeRandom % 2 == 0) {
 			AdView youmiAdView = new AdView(this, AdSize.SIZE_320x50);
 	        mAdContainer.addView(youmiAdView);
 
@@ -385,6 +385,7 @@ public class SubscriptionActivity extends Activity {
 	ArrayList<SubscriptionEntity> items = new ArrayList<SubscriptionEntity>();
 	SubscriptionListViewAdapter adapter;
 	
+	private int currentSubscriptionNum = 0;
 	private void showSubscription() {
 		items.clear();
 		NovelDB db = new NovelDB(getApplicationContext());
@@ -433,6 +434,8 @@ public class SubscriptionActivity extends Activity {
 		}
 		adapter = new SubscriptionListViewAdapter(this, items);
 		lvBookList.setAdapter(adapter);
+		currentSubscriptionNum = items.size();
+		
 	}
 	
 	@Override
@@ -509,37 +512,45 @@ public class SubscriptionActivity extends Activity {
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
 							boolean flag = true;
-							NovelDB db = new NovelDB(getApplicationContext());
-							long _id = -1;
-							try {
-								ContentValues values = new ContentValues();  
-								values.put(NovelDB.BOOK_NAME, bookName);
-								values.put(NovelDB.SRC_ID, 1);
-								values.put(NovelDB.BOOK_URL, bookUrl);
-								values.put(NovelDB.TYPE_ID, 0);
-								values.put(NovelDB.BOOK_SITE, bookSite);
-								_id = db.insert(NovelDB.BOOK_LIST_TABLE, null, values);  
-								
-								BookEntity book = new BookEntity(_id, bookName, "", bookUrl, bookUpdate, 0, bookSite, srcMap.get(1));
-								if(book.getLatestTitle() == null)
-									book.setLatestTitle("");
-								if(db.addSubscription(book) == -1) {
-									flag = false;
-									Toast.makeText(SubscriptionActivity.this, bookName + " 已在您的订阅列表中", Toast.LENGTH_SHORT).show();
-								}
-								
-							} finally {
-								db.close();
+//							SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+							int subscriptinLimit = 3;// prefs.getInt("subscriptinLimit", 0);
+							if(currentSubscriptionNum >= subscriptinLimit) {
+								Toast.makeText(SubscriptionActivity.this, "目前暂时支持订阅" + subscriptinLimit + "本小说, 我会尽快放开这个限制。", Toast.LENGTH_SHORT).show();
+								Toast.makeText(SubscriptionActivity.this, "长按小说名称，可以取消订阅。", Toast.LENGTH_SHORT).show();
 							}
+							else {
+								NovelDB db = new NovelDB(getApplicationContext());
+								long _id = -1;
+								try {
+									ContentValues values = new ContentValues();  
+									values.put(NovelDB.BOOK_NAME, bookName);
+									values.put(NovelDB.SRC_ID, 1);
+									values.put(NovelDB.BOOK_URL, bookUrl);
+									values.put(NovelDB.TYPE_ID, 0);
+									values.put(NovelDB.BOOK_SITE, bookSite);
+									_id = db.insert(NovelDB.BOOK_LIST_TABLE, null, values);  
+									
+									BookEntity book = new BookEntity(_id, bookName, "", bookUrl, bookUpdate, 0, bookSite, srcMap.get(1));
+									if(book.getLatestTitle() == null)
+										book.setLatestTitle("");
+									if(db.addSubscription(book) == -1) {
+										flag = false;
+										Toast.makeText(SubscriptionActivity.this, bookName + " 已在您的订阅列表中", Toast.LENGTH_SHORT).show();
+									}
+									
+								} finally {
+									db.close();
+								}
 							
-							showSubscription();
-							for(int i = 0; i < items.size(); i ++) {
-				        		if(_id == items.get(i).getBookId()) {
-				        			items.get(i).getBook().setUpdateOrder(0);
-				        			refresh(i);
-				        			break;
-				        		}
-				        	}
+								showSubscription();
+								for(int i = 0; i < items.size(); i ++) {
+					        		if(_id == items.get(i).getBookId()) {
+					        			items.get(i).getBook().setUpdateOrder(0);
+					        			refresh(i);
+					        			break;
+					        		}
+					        	}
+							}
 						}
 					})
 				 	.setNegativeButton("取消", null).show();

@@ -13,7 +13,7 @@ public class SchedulerSetupReceiver extends BroadcastReceiver {
 
 	private static final String APP_TAG = "com.novel.subscription";
 	 
-	private static final int EXEC_INTERVAL = 30 * 1000;
+	private static final int EXEC_INTERVAL = 3600 * 1000;
  
 	@Override
 	public void onReceive(final Context ctx, final Intent intent) {

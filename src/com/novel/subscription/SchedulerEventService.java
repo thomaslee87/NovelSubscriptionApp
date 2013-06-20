@@ -59,6 +59,8 @@ public class SchedulerEventService extends Service {
 		} catch(Exception e) {
 			interval = 7200;
 		}
+		if(TestNetworkStatus() != -1)
+			interval = 3600;
 		Log.d(APP_TAG, "Interval:" + interval);
 		
 		Calendar now = Calendar.getInstance();
@@ -81,13 +83,13 @@ public class SchedulerEventService extends Service {
 			updateThread.autoDownloadInWifi = autoDownloadInWifi;
 			updateThread.start();
 			lastUpdateTime = now.getTimeInMillis();
+			
+			now.add(Calendar.SECOND, interval);
+			AlarmManager alarmManager = (AlarmManager) ctx.getSystemService(Context.ALARM_SERVICE);
+			Intent i = new Intent(ctx, SchedulerEventReceiver.class); // explicit intent
+			PendingIntent intentExecuted = PendingIntent.getBroadcast(ctx, 0, i, PendingIntent.FLAG_CANCEL_CURRENT);
+			alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, now.getTimeInMillis(), interval * 1000, intentExecuted);
 		}
-		
-		now.add(Calendar.SECOND, interval);
-		AlarmManager alarmManager = (AlarmManager) ctx.getSystemService(Context.ALARM_SERVICE);
-		Intent i = new Intent(ctx, SchedulerEventReceiver.class); // explicit intent
-		PendingIntent intentExecuted = PendingIntent.getBroadcast(ctx, 0, i, PendingIntent.FLAG_CANCEL_CURRENT);
-		alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, now.getTimeInMillis(), interval * 1000, intentExecuted);
 		
 		return Service.START_STICKY;
 	}
@@ -114,9 +116,11 @@ public class SchedulerEventService extends Service {
         		String books = bundle.getString("updateBooks");
         		if(needNotify)
         			showNotification(defaultSound|defaultVibrate, books);
+        		updateThread = null;
         	}
         	else if(msg.what == 0) {
         		isRunning = false;
+        		updateThread = null;
         	}
         }
     };
