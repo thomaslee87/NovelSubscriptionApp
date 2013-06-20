@@ -231,8 +231,6 @@ public class SubscriptionActivity extends Activity {
 			}
 		});
 		
-		showSubscription();
-		
 		mAdContainer = (RelativeLayout) findViewById(R.id.adcontainer);
 		
 		Calendar now = Calendar.getInstance();
@@ -314,9 +312,20 @@ public class SubscriptionActivity extends Activity {
 		// TODO Auto-generated method stub
 		super.onResume();
 		
-//		showSubscription();
+		showSubscription();
 		if(adapter != null)
 			adapter.notifyDataSetChanged();
+		
+		if(afterChangeSourceSite) {
+			for(int i = 0; i < items.size(); i ++) {
+	    		if(changeSourceSiteBookId == items.get(i).getBookId()) {
+	    			items.get(i).getBook().setUpdateOrder(0);
+	    			refresh(i);
+	    			break;
+	    		}
+	    	}
+			afterChangeSourceSite = false;
+		}
 		
 		Calendar now = Calendar.getInstance();
 		Context ctx = getApplicationContext();
@@ -330,20 +339,15 @@ public class SubscriptionActivity extends Activity {
 		}
 	}
 	
+	private boolean afterChangeSourceSite = false;
+	private int changeSourceSiteBookId;
 	@Override  
     protected void onActivityResult(int requestCode, int resultCode, Intent data)  
     {  
-        if(100 == requestCode && 20 == resultCode)  
-        {  
-        	int book_id = data.getExtras().getInt("book_id");
-        	for(int i = 0; i < items.size(); i ++) {
-        		if(book_id == items.get(i).getBookId()) {
-        			items.get(i).getBook().setUpdateOrder(0);
-        			refresh(i);
-        			break;
-        		}
-        	}
-        }  
+		if(100 == requestCode && 20 == resultCode)  {
+        	changeSourceSiteBookId = data.getExtras().getInt("book_id");
+        	afterChangeSourceSite = true;
+        }
 //        super.onActivityResult(requestCode, resultCode, data);  
     }  
 
@@ -601,12 +605,19 @@ public class SubscriptionActivity extends Activity {
     	public boolean isRunning;
     	public int position;
     	public boolean autoDownloadInWifi;
+    	public boolean onlyRecent;
     	
         @Override
         public void run()
         {
+        	Context ctx = getApplicationContext();
+//			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ctx);
+			
+//			onlyRecent = prefs.getBoolean("onlyRecent", true);
+			onlyRecent = false;
+        	
         	isRunning = true;
-        	NovelDB db = new NovelDB(getApplicationContext());
+        	NovelDB db = new NovelDB(ctx);
 
         	Queue<BookChapterEntity> chapterQueue = new LinkedList<BookChapterEntity>();
         	
@@ -723,6 +734,9 @@ public class SubscriptionActivity extends Activity {
 		        			totalPage = Integer.parseInt(mPage.group(2));
 		        		}
 		        		fetchPageNum = totalPage;
+		        		
+		        		if(onlyRecent)
+		        			fetchPageNum = 0;
 	        		}
 	        		fetchPageNum --;
         		} while (fetchPageNum > 0);

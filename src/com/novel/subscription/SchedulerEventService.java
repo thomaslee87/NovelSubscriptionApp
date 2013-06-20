@@ -136,6 +136,7 @@ public class SchedulerEventService extends Service {
 //    	public boolean isRunning;
     	public int position;
     	public boolean autoDownloadInWifi;
+    	public boolean onlyRecent;
     	
     	private ArrayList<SubscriptionEntity> items = new ArrayList<SubscriptionEntity>();
     	
@@ -144,7 +145,13 @@ public class SchedulerEventService extends Service {
         {
         	readSubscription();
         	
-        	NovelDB db = new NovelDB(getApplicationContext());
+        	Context ctx = getApplicationContext();
+//			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ctx);
+			
+//			onlyRecent = prefs.getBoolean("onlyRecent", true);
+			onlyRecent = false;
+        	
+        	NovelDB db = new NovelDB(ctx);
         	
         	Queue<BookChapterEntity> chapterQueue = new LinkedList<BookChapterEntity>();
         	
@@ -231,6 +238,8 @@ public class SchedulerEventService extends Service {
 		        			totalPage = Integer.parseInt(mPage.group(2));
 		        		}
 		        		fetchPageNum = totalPage;
+		        		if(onlyRecent)
+		        			fetchPageNum = 0;
 	        		}
 	        		fetchPageNum --;
         		} while (fetchPageNum > 0);
