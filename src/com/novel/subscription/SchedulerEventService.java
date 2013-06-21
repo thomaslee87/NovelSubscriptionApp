@@ -287,8 +287,11 @@ public class SchedulerEventService extends Service {
 	            			Matcher mUrlOrder = pOrder.matcher(url);
 	            			if(mUrlOrder.find()) {
 	            				chapterOrder = 0;
+	            				String ordStr = mUrlOrder.group(1);
+	            				if(ordStr == null)
+	            					ordStr = mUrlOrder.group(2);
 	            				try {
-	            					chapterOrder = Integer.parseInt(mUrlOrder.group(1));
+	            					chapterOrder = Integer.parseInt(ordStr);
 	            				}catch (Exception e) {
 	            					Log.i("test", book.getName() + " " + mUrlOrder.group());
 	            					url = lastUrl;

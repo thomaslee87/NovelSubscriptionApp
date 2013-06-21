@@ -157,7 +157,7 @@ public class NovelDB {
 	public long createSourceRecords(JSONObject jsonObj) throws JSONException, UnsupportedEncodingException {
 		ContentValues values = new ContentValues();
 		values.put(ID, jsonObj.getInt(ID));
-		values.put(SRC_NAME, URLDecoder.decode(jsonObj.getString("name"), "utf-8"));
+		values.put(SRC_NAME, jsonObj.getString("name"));//URLDecoder.decode(jsonObj.getString("name"), "utf-8"));
 		values.put(SRC_DOMAIN, jsonObj.getString("domain"));
 		values.put(SRC_PATTERN_CHAPTER, jsonObj.getString(SRC_PATTERN_CHAPTER));
 		values.put(SRC_PATTERN_IMG, jsonObj.getString(SRC_PATTERN_IMG));
