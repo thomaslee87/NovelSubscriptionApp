@@ -528,6 +528,7 @@ public class SubscriptionActivity extends Activity {
 								Toast.makeText(SubscriptionActivity.this, "长按小说名称，可以取消订阅。", Toast.LENGTH_SHORT).show();
 							}
 							else {
+								Toast.makeText(SubscriptionActivity.this, "长按小说名称，可以管理订阅。", Toast.LENGTH_SHORT).show();
 								NovelDB db = new NovelDB(getApplicationContext());
 								long _id = -1;
 								try {
