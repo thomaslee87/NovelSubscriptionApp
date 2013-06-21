@@ -46,6 +46,8 @@ import cn.domob.android.ads.DomobAdEventListener;
 import cn.domob.android.ads.DomobAdManager.ErrorCode;
 import cn.domob.android.ads.DomobAdView;
 
+import com.baidu.mobstat.StatService;
+
 public class SubscriptionActivity extends Activity {
 	
 	private TextView tvRefresh, tvNet ;
@@ -366,8 +368,17 @@ public class SubscriptionActivity extends Activity {
 		else {
 //			mAdContainer.setVisibility(View.VISIBLE);
 		}
+		
+		StatService.onResume(this);
 	}
 	
+	@Override
+	protected void onPause() {
+		// TODO Auto-generated method stub
+		super.onPause();
+		StatService.onPause(this);
+	}
+
 	private boolean afterChangeSourceSite = false;
 	private int changeSourceSiteBookId;
 	@Override  

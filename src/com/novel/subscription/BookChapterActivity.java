@@ -13,8 +13,6 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 
-import com.novel.subscription.R;
-
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
@@ -35,6 +33,8 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import com.baidu.mobstat.StatService;
 
 public class BookChapterActivity extends Activity {
 	
@@ -277,6 +277,14 @@ public class BookChapterActivity extends Activity {
 	protected void onResume() {
 		super.onResume();
 //		showChapterList(book);
+		StatService.onResume(this);
+	}
+
+	@Override
+	protected void onPause() {
+		// TODO Auto-generated method stub
+		super.onPause();
+		StatService.onPause(this);
 	}
 
 	@Override

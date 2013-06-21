@@ -1,5 +1,6 @@
 package com.novel.subscription;
 
+import com.baidu.mobstat.StatService;
 import com.novel.subscription.R;
 
 import android.app.Activity;
@@ -18,6 +19,20 @@ public class MoreActivity extends Activity {
 		aboutDisplayer = (WebView) findViewById(R.id.aboutDisplayer);
 		aboutDisplayer.loadUrl("file:///android_asset/about.html");
 
+	}
+
+	@Override
+	protected void onPause() {
+		// TODO Auto-generated method stub
+		super.onPause();
+		StatService.onPause(this);
+	}
+
+	@Override
+	protected void onResume() {
+		// TODO Auto-generated method stub
+		super.onResume();
+		StatService.onResume(this);
 	}
 
 }

@@ -27,7 +27,6 @@ import android.os.IBinder;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.widget.HorizontalScrollView;
 
 public class SchedulerEventService extends Service {
 	private static final String APP_TAG = "com.novel.subscription";
@@ -43,6 +42,7 @@ public class SchedulerEventService extends Service {
 	@Override
 	public int onStartCommand(final Intent intent, final int flags,
 			final int startId) {
+//		showNotification(Notification.DEFAULT_VIBRATE, "123");
 		Log.d(APP_TAG, "event received in service: " + new Date().toString());
 		android.os.Debug.waitForDebugger();
 		
@@ -59,39 +59,122 @@ public class SchedulerEventService extends Service {
 		} catch(Exception e) {
 			interval = 7200;
 		}
-		if(TestNetworkStatus() != -1)
-			interval = 3600;
+		
+//		interval = 5;
 		Log.d(APP_TAG, "Interval:" + interval);
 		
 		Calendar now = Calendar.getInstance();
 		
-		boolean lowCostMode = prefs.getBoolean("lowCostMode", true);
-		int hour = now.getTime().getHours();
-		boolean needUpdate = true;
-		if(lowCostMode)
-			needUpdate = lowCostMode && hour > 7 && hour < 23;
+		int hour = now.get(Calendar.HOUR_OF_DAY);
+		int min = now.get(Calendar.MINUTE);
+		String hourString = hour + "";
+		if(hour < 10) 
+			hourString = "0" + hour;
+		String minString = min + "";
+		if(min < 10)
+			minString = "0" + min;
 		
-		if(updateThread == null && !isRunning 
-				&& needUpdate
-				&& TestNetworkStatus() != -1 
-				&& (now.getTimeInMillis() - lastUpdateTime >= (interval - 300) * 1000) ) {
+		String nowTime = hourString + ":" + minString;
+		String startTime = prefs.getString("timePickerUpdateStart", "07:00");
+		String endTime = prefs.getString("timePickerUpdateEnd", "23:00");
+		
+		String[] startItems = startTime.split(":");
+		int startHour = Integer.parseInt(startItems[0]);
+		int startMin = Integer.parseInt(startItems[1]);
+		
+		String[] endItems = endTime.split(":");
+		int endHour = Integer.parseInt(endItems[0]);
+		int endMin = Integer.parseInt(endItems[1]);
+		
+		boolean isSleepyTime = !(nowTime.compareTo(startTime) >= 0 && nowTime.compareTo(endTime) <= 0);
+		
+		if(isSleepyTime) {
+			int triggerInterval = secondBetween(hour, min, startHour, startMin) * 1000;
+			now.add(Calendar.SECOND, triggerInterval);
 			
-			Log.d(APP_TAG, "update begins.");
-			
-			isRunning = true;
-			updateThread = new UpdateThread();
-			updateThread.autoDownloadInWifi = autoDownloadInWifi;
-			updateThread.start();
-			lastUpdateTime = now.getTimeInMillis();
-			
-			now.add(Calendar.SECOND, interval);
 			AlarmManager alarmManager = (AlarmManager) ctx.getSystemService(Context.ALARM_SERVICE);
 			Intent i = new Intent(ctx, SchedulerEventReceiver.class); // explicit intent
 			PendingIntent intentExecuted = PendingIntent.getBroadcast(ctx, 0, i, PendingIntent.FLAG_CANCEL_CURRENT);
 			alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, now.getTimeInMillis(), interval * 1000, intentExecuted);
 		}
+		else {
+			int secondGap = secondBetween(startHour, startMin, hour, min);
+			int end = endHour;
+//			if(startMin > endMin)
+//				end = endHour - 1;
+			
+			int lastHourSecondGap = 0;
+			for(int nextCheckHour = startHour; nextCheckHour <= end; nextCheckHour += interval / 3600) {
+				int nextHourSecondGap = (nextCheckHour - startHour) * 3600;
+				if(secondGap < nextHourSecondGap) {
+					now.add(Calendar.SECOND, nextHourSecondGap - secondGap);
+					AlarmManager alarmManager = (AlarmManager) ctx.getSystemService(Context.ALARM_SERVICE);
+					Intent i = new Intent(ctx, SchedulerEventReceiver.class); // explicit intent
+					PendingIntent intentExecuted = PendingIntent.getBroadcast(ctx, 0, i, PendingIntent.FLAG_CANCEL_CURRENT);
+					alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, now.getTimeInMillis(), interval * 1000, intentExecuted);
+					break;
+				}
+				else 
+					lastHourSecondGap = secondGap - nextHourSecondGap;
+			}
+			if(lastUpdateTime == 0)
+				lastUpdateTime = now.getTimeInMillis() - lastHourSecondGap * 1000;
+			
+//					now.add(Calendar.SECOND, interval);
+//					AlarmManager alarmManager = (AlarmManager) ctx.getSystemService(Context.ALARM_SERVICE);
+//					Intent i = new Intent(ctx, SchedulerEventReceiver.class); // explicit intent
+//					PendingIntent intentExecuted = PendingIntent.getBroadcast(ctx, 0, i, PendingIntent.FLAG_CANCEL_CURRENT);
+//					alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, now.getTimeInMillis(), interval * 1000, intentExecuted);
+			
+			if(updateThread == null && !isRunning 
+					&& TestNetworkStatus() != -1 
+					&& (now.getTimeInMillis() - lastUpdateTime >= (interval - 300) * 1000) ) {
+				
+				Log.d(APP_TAG, "update begins.");
+				
+				isRunning = true;
+				updateThread = new UpdateThread();
+				updateThread.autoDownloadInWifi = autoDownloadInWifi;
+				updateThread.start();
+				now = Calendar.getInstance();
+				lastUpdateTime = now.getTimeInMillis();
+			}
+		}
 		
 		return Service.START_STICKY;
+	}
+	
+	private int secondBetween(int hour, int min, int targetHour, int targetMin) {
+		int minDistance = -1;
+		int hourAdjust = 0;
+		if(min > targetMin) {
+			minDistance = 60 - min + targetMin;
+			hourAdjust = -1;
+		}
+		else {
+			minDistance = targetMin - min;
+		}
+		System.out.println(minDistance);
+		
+		int hourDistance = -1;
+		if(hour < targetHour){
+			hourDistance = targetHour - hour;
+		}
+		else if(hour > targetHour){
+			hourDistance = 24 - targetHour + hour;
+		}
+		else {
+			if(min < targetMin) {
+				hourDistance = targetHour - hour;
+			}
+			else {
+				hourDistance = 24 - targetHour + hour;
+			}
+		}
+		hourDistance += hourAdjust;
+		System.out.println(hourDistance);
+		
+		return (hourDistance * 60 + minDistance) * 60;
 	}
 	
     Handler handler = new Handler() {

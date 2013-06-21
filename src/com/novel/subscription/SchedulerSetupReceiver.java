@@ -23,7 +23,7 @@ public class SchedulerSetupReceiver extends BroadcastReceiver {
 		Intent i = new Intent(ctx, SchedulerEventReceiver.class); // explicit intent
 		PendingIntent intentExecuted = PendingIntent.getBroadcast(ctx, 0, i, PendingIntent.FLAG_CANCEL_CURRENT);
 		Calendar now = Calendar.getInstance();
-		now.add(Calendar.SECOND, 20);
+//		now.add(Calendar.SECOND, 20);
 		alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, now.getTimeInMillis(), EXEC_INTERVAL, intentExecuted);
 	}
 

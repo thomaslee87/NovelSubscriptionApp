@@ -9,6 +9,9 @@ import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
+import android.widget.Toast;
+
+import com.baidu.mobstat.StatService;
 
 public class SettingActivity extends PreferenceActivity {
 	@Override
@@ -21,7 +24,6 @@ public class SettingActivity extends PreferenceActivity {
 		final Preference notifyVibrate = findPreference("notifyVibrate");
 		final ListPreference  updateInterval = (ListPreference)findPreference("updateInterval");
 		
-		Context c = getApplicationContext();
         final SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
         boolean needUpdate = sp.getBoolean("updateNotify", false);
 		notifySound.setEnabled(needUpdate);
@@ -51,6 +53,56 @@ public class SettingActivity extends PreferenceActivity {
 			}
 		});
 		
+		final TimePreference timePickerUpdateStart = (TimePreference) findPreference("timePickerUpdateStart");
+		timePickerUpdateStart.setSummary(sp.getString("timePickerUpdateStart", "07:00"));
+		timePickerUpdateStart.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
+			
+			@Override
+			public boolean onPreferenceChange(Preference preference, Object newValue) {
+				// TODO Auto-generated method stub
+				if(((String)newValue).compareTo(sp.getString("timePickerUpdateEnd", "23:00")) >= 0) {
+					Toast.makeText(SettingActivity.this, "更新结束时间必须大于开始时间。", Toast.LENGTH_SHORT).show();
+					return false;
+				}
+				else {
+					timePickerUpdateStart.setSummary((String)newValue);
+					return true;
+				}
+			}
+		});
+		
+		final TimePreference timePickerUpdateEnd = (TimePreference) findPreference("timePickerUpdateEnd");
+		timePickerUpdateEnd.setSummary(sp.getString("timePickerUpdateEnd", "23:00"));
+		timePickerUpdateEnd.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
+			
+			@Override
+			public boolean onPreferenceChange(Preference preference, Object newValue) {
+				// TODO Auto-generated method stub
+				if(((String)newValue).compareTo(sp.getString("timePickerUpdateStart", "07:00")) <= 0) {
+					Toast.makeText(SettingActivity.this, "更新结束时间必须大于开始时间。", Toast.LENGTH_SHORT).show();
+					return false;
+				}
+				else {
+					timePickerUpdateEnd.setSummary((String)newValue);
+					return true;
+				}
+			}
+		});
+		
+	}
+
+	@Override
+	protected void onPause() {
+		// TODO Auto-generated method stub
+		super.onPause();
+		StatService.onPause(this);
+	}
+
+	@Override
+	protected void onResume() {
+		// TODO Auto-generated method stub
+		super.onResume();
+		StatService.onResume(this);
 	}
 	
 }

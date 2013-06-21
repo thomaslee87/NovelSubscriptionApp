@@ -28,6 +28,8 @@ import android.view.Menu;
 import android.view.Window;
 import android.widget.TabHost;
 
+import com.baidu.mobstat.StatService;
+
 @SuppressWarnings("deprecation")
 public class MainActivity extends ActivityGroup {
 	
@@ -43,6 +45,8 @@ public class MainActivity extends ActivityGroup {
 		
 		AdManager.getInstance(this).init("a0659380b6ce6b1b",
 				"e9558d8cbbc1c11f", false);
+		
+		StatService.setSessionTimeOut(30);
 
 		final AppOptions appOptions = null;// new AppOptions(null);
 		
@@ -181,7 +185,7 @@ public class MainActivity extends ActivityGroup {
 			interval = 7200;
 		}
 		Calendar now = Calendar.getInstance();
-		now.add(Calendar.SECOND, 10);
+//		now.add(Calendar.SECOND, 10);
 		AlarmManager alarmManager = (AlarmManager) ctx.getSystemService(Context.ALARM_SERVICE);
 		Intent i = new Intent(ctx, SchedulerEventReceiver.class); // explicit intent
 		PendingIntent intentExecuted = PendingIntent.getBroadcast(ctx, 0, i, PendingIntent.FLAG_CANCEL_CURRENT);
@@ -194,7 +198,6 @@ public class MainActivity extends ActivityGroup {
 		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
 	}
-	
-	
+
 
 }

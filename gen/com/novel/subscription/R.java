@@ -9,6 +9,8 @@ package com.novel.subscription;
 
 public final class R {
     public static final class array {
+        public static final int first_update=0x7f040002;
+        public static final int first_update_values=0x7f040003;
         public static final int update_interval=0x7f040000;
         public static final int update_interval_values=0x7f040001;
     }
@@ -28,21 +30,20 @@ public final class R {
         public static final int dict_normal=0x7f020000;
         public static final int dict_selected=0x7f020001;
         public static final int ic_launcher=0x7f020002;
-        public static final int ic_menu_refresh=0x7f020003;
-        public static final int notes_normal=0x7f020004;
-        public static final int notes_selected=0x7f020005;
-        public static final int tab_bg_normal=0x7f020006;
-        public static final int tab_bg_pressed=0x7f020007;
-        public static final int tab_bg_selected=0x7f020008;
-        public static final int tab_selector=0x7f020009;
-        public static final int tab_selector2=0x7f02000a;
-        public static final int tab_selector3=0x7f02000b;
-        public static final int tab_selector4=0x7f02000c;
-        public static final int tab_xia=0x7f02000d;
-        public static final int trans_normal=0x7f02000e;
-        public static final int trans_selected=0x7f02000f;
-        public static final int wiki_normal=0x7f020010;
-        public static final int wiki_selected=0x7f020011;
+        public static final int notes_normal=0x7f020003;
+        public static final int notes_selected=0x7f020004;
+        public static final int tab_bg_normal=0x7f020005;
+        public static final int tab_bg_pressed=0x7f020006;
+        public static final int tab_bg_selected=0x7f020007;
+        public static final int tab_selector=0x7f020008;
+        public static final int tab_selector2=0x7f020009;
+        public static final int tab_selector3=0x7f02000a;
+        public static final int tab_selector4=0x7f02000b;
+        public static final int tab_xia=0x7f02000c;
+        public static final int trans_normal=0x7f02000d;
+        public static final int trans_selected=0x7f02000e;
+        public static final int wiki_normal=0x7f02000f;
+        public static final int wiki_selected=0x7f020010;
     }
     public static final class id {
         public static final int aboutDisplayer=0x7f090000;

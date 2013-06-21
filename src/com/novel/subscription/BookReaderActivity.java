@@ -31,6 +31,8 @@ import cn.domob.android.ads.DomobAdEventListener;
 import cn.domob.android.ads.DomobAdManager.ErrorCode;
 import cn.domob.android.ads.DomobAdView;
 
+import com.baidu.mobstat.StatService;
+
 public class BookReaderActivity extends Activity {
 	
 	private WebView wvBookDisplayer;
@@ -212,6 +214,8 @@ public class BookReaderActivity extends Activity {
 			mAdContainer.setVisibility(View.VISIBLE);
 		}
 //		showChapterContent(true);
+		
+		StatService.onResume(this);
 	}
 	
 	@Override
@@ -219,6 +223,8 @@ public class BookReaderActivity extends Activity {
 		super.onPause();
 		if(thread != null)
 			thread.isRunning = false;
+		
+		StatService.onPause(this);
 	}
 	
 	private void showChapterContent(boolean needLoad) {

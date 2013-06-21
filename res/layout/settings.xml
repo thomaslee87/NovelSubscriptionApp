@@ -18,6 +18,27 @@
 			android:entries="@array/update_interval"  
 			android:entryValues="@array/update_interval_values"  
 			/>  
+	    <com.novel.subscription.TimePreference
+	        android:key="timePickerUpdateStart"
+	        android:title="更新开始时间点"
+	        android:dialogMessage="请指定更新开始的时间点：" 
+	        android:dialogTitle="请指定更新开始的时间点：" 
+  	        android:defaultValue=""
+	        android:summary=""
+	        android:positiveButtonText="确定" 
+	        android:negativeButtonText="取消" 
+	        />
+	    <com.novel.subscription.TimePreference
+	        android:key="timePickerUpdateEnd"
+	        android:title="更新结束时间点"
+	        android:dialogMessage="请指定更新结束的时间点：" 
+	        android:dialogTitle="请指定更新结束的时间点：" 
+	        android:defaultValue=""
+	        android:summary=""
+	        android:positiveButtonText="确定" 
+	        android:negativeButtonText="取消" 
+	        
+	        />
 	 </PreferenceCategory>
 	  
 	<PreferenceCategory android:title="提醒设置">  
@@ -77,14 +98,14 @@
 			android:summaryOff="关闭"  
 			android:defaultValue="true"  
 		/> 
-		<CheckBoxPreference  
+		<!-- CheckBoxPreference  
 			android:key="lowCostMode"  
 			android:title="省流量模式（23:00~7:00不更新）"  
 			android:summaryOn="开启"  
 			android:summaryOff="关闭"  
 			android:defaultValue="true"  
 		/> 
-			<!--  CheckBoxPreference  
+			< CheckBoxPreference  
 			android:key="onlyRecent"  
 			android:title="新的订阅只读取最近的章节"  
 			android:summaryOn="开启"  
