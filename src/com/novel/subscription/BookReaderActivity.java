@@ -27,9 +27,6 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import cn.domob.android.ads.DomobAdEventListener;
-import cn.domob.android.ads.DomobAdManager.ErrorCode;
-import cn.domob.android.ads.DomobAdView;
 
 import com.baidu.mobstat.StatService;
 
@@ -131,6 +128,7 @@ public class BookReaderActivity extends Activity {
 			});
 		}
 		else {
+			/*
 			// Create ad view
 			mAdview320x50 = new DomobAdView(this, MainActivity.PUBLISHER_ID, MainActivity.InlinePPID, DomobAdView.INLINE_SIZE_320X50);
 			if(hour >= 20)
@@ -192,12 +190,13 @@ public class BookReaderActivity extends Activity {
 			});
 			
 			mAdContainer.addView(mAdview320x50);
+			*/
 		}
 		
 	}
 			
 	RelativeLayout mAdContainer;
-	DomobAdView mAdview320x50;
+//	DomobAdView mAdview320x50;
 	
 	@Override
 	protected void onResume() {

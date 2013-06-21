@@ -21,7 +21,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -42,9 +41,6 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import cn.domob.android.ads.DomobAdEventListener;
-import cn.domob.android.ads.DomobAdManager.ErrorCode;
-import cn.domob.android.ads.DomobAdView;
 
 import com.baidu.mobstat.StatService;
 
@@ -267,6 +263,7 @@ public class SubscriptionActivity extends Activity {
 	        });
 		}
 		else {
+			/*
 			// Create ad view
 			mAdview320x50 = new DomobAdView(this, MainActivity.PUBLISHER_ID, MainActivity.InlinePPID, DomobAdView.INLINE_SIZE_320X50);
 			if(hour >= 20)
@@ -328,11 +325,12 @@ public class SubscriptionActivity extends Activity {
 			});
 			
 			mAdContainer.addView(mAdview320x50);
+			*/
 		}
 	}
 	
 	RelativeLayout mAdContainer;
-	DomobAdView mAdview320x50;
+//	DomobAdView mAdview320x50;
 	
 	private HashMap<Integer, SourceEntity> srcMap = new HashMap<Integer, SourceEntity>();
 	
