@@ -11,9 +11,6 @@ import java.util.Queue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.youmi.android.banner.AdSize;
-import net.youmi.android.banner.AdView;
-import net.youmi.android.banner.AdViewLinstener;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentValues;
@@ -29,6 +26,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
@@ -36,12 +34,14 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.adsmogo.adview.AdsMogoLayout;
 import com.baidu.mobstat.StatService;
 
 public class SubscriptionActivity extends Activity {
@@ -232,37 +232,45 @@ public class SubscriptionActivity extends Activity {
 			}
 		});
 		
-		mAdContainer = (RelativeLayout) findViewById(R.id.adcontainer);
+		adsMogoLayoutCode = new AdsMogoLayout(this, MainActivity.MogoID);
+		FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+			FrameLayout.LayoutParams.WRAP_CONTENT,
+			FrameLayout.LayoutParams.WRAP_CONTENT);
+		params.bottomMargin = 0;
+		params.gravity = Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM;
+		addContentView(adsMogoLayoutCode, params);
 		
-		Calendar now = Calendar.getInstance();
-		int hour = now.get(Calendar.HOUR_OF_DAY);
-		
-		long timeRandom = now.getTimeInMillis() / 1000;
-		if(true){//timeRandom % 2 == 0) {
-			AdView youmiAdView = new AdView(this, AdSize.SIZE_320x50);
-	        mAdContainer.addView(youmiAdView);
-
-	        // 监听广告条接口
-	        youmiAdView.setAdListener(new AdViewLinstener() {
-	            
-	            @Override
-	            public void onSwitchedAd(AdView arg0) {
-	                Log.i("YoumiSample", "广告条切换");
-	            }
-	            
-	            @Override
-	            public void onReceivedAd(AdView arg0) {
-	                Log.i("YoumiSample", "请求广告成功");
-	                
-	            }
-	            
-	            @Override
-	            public void onFailedToReceivedAd(AdView arg0) {
-	                Log.i("YoumiSample", "请求广告失败");
-	            }
-	        });
-		}
-		else {
+//		mAdContainer = (RelativeLayout) findViewById(R.id.adcontainer);
+//		
+//		Calendar now = Calendar.getInstance();
+//		int hour = now.get(Calendar.HOUR_OF_DAY);
+//		
+//		long timeRandom = now.getTimeInMillis() / 1000;
+//		if(true){//timeRandom % 2 == 0) {
+//			AdView youmiAdView = new AdView(this, AdSize.SIZE_320x50);
+//	        mAdContainer.addView(youmiAdView);
+//
+//	        // 监听广告条接口
+//	        youmiAdView.setAdListener(new AdViewLinstener() {
+//	            
+//	            @Override
+//	            public void onSwitchedAd(AdView arg0) {
+//	                Log.i("YoumiSample", "广告条切换");
+//	            }
+//	            
+//	            @Override
+//	            public void onReceivedAd(AdView arg0) {
+//	                Log.i("YoumiSample", "请求广告成功");
+//	                
+//	            }
+//	            
+//	            @Override
+//	            public void onFailedToReceivedAd(AdView arg0) {
+//	                Log.i("YoumiSample", "请求广告失败");
+//	            }
+//	        });
+//		}
+//		else {
 			/*
 			// Create ad view
 			mAdview320x50 = new DomobAdView(this, MainActivity.PUBLISHER_ID, MainActivity.InlinePPID, DomobAdView.INLINE_SIZE_320X50);
@@ -326,8 +334,10 @@ public class SubscriptionActivity extends Activity {
 			
 			mAdContainer.addView(mAdview320x50);
 			*/
-		}
+//		}
 	}
+	
+	private AdsMogoLayout adsMogoLayoutCode;
 	
 	RelativeLayout mAdContainer;
 //	DomobAdView mAdview320x50;
@@ -356,16 +366,16 @@ public class SubscriptionActivity extends Activity {
 			afterChangeSourceSite = false;
 		}
 		
-		Calendar now = Calendar.getInstance();
-		Context ctx = getApplicationContext();
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ctx);
-		long lastClkAdTime = prefs.getLong(ConstDefinition.LAST_CLK_AD_TIME, 0);
-		if(now.getTimeInMillis() - lastClkAdTime < 86400 * 1000) {
-//			mAdContainer.setVisibility(View.GONE);
-		}
-		else {
-//			mAdContainer.setVisibility(View.VISIBLE);
-		}
+//		Calendar now = Calendar.getInstance();
+//		Context ctx = getApplicationContext();
+//		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ctx);
+//		long lastClkAdTime = prefs.getLong(ConstDefinition.LAST_CLK_AD_TIME, 0);
+//		if(now.getTimeInMillis() - lastClkAdTime < 86400 * 1000) {
+////			mAdContainer.setVisibility(View.GONE);
+//		}
+//		else {
+////			mAdContainer.setVisibility(View.VISIBLE);
+//		}
 		
 		StatService.onResume(this);
 	}
@@ -375,6 +385,16 @@ public class SubscriptionActivity extends Activity {
 		// TODO Auto-generated method stub
 		super.onPause();
 		StatService.onPause(this);
+	}
+	
+	@Override
+	protected void onDestroy() {
+		// 清除 adsMogoLayout 实例 所产生用于多线程缓冲机制的线程池
+		// 此方法请不要轻易调用，如果调用时间不当，会造成无法统计计数
+		if (adsMogoLayoutCode != null) {
+			adsMogoLayoutCode.clearThread();
+		}
+		super.onDestroy();
 	}
 
 	private boolean afterChangeSourceSite = false;

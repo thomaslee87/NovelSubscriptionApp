@@ -28,6 +28,7 @@ import android.view.Menu;
 import android.view.Window;
 import android.widget.TabHost;
 
+import com.adsmogo.adview.AdsMogoLayout;
 import com.baidu.mobstat.StatService;
 
 @SuppressWarnings("deprecation")
@@ -35,6 +36,8 @@ public class MainActivity extends ActivityGroup {
 	
 	public static final String PUBLISHER_ID = "56OJzYT4uNQKns3xwL";
 	public static final String InlinePPID = "16TLm_IlApcTwNUHb4Wb5Hwk";
+	
+	public static final String MogoID = "b4b6283624584c73bb44f8944b138b51";
     
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -43,8 +46,8 @@ public class MainActivity extends ActivityGroup {
 		
 		setContentView(R.layout.activity_main);
 		
-		AdManager.getInstance(this).init("a0659380b6ce6b1b",
-				"e9558d8cbbc1c11f", false);
+//		AdManager.getInstance(this).init("a0659380b6ce6b1b",
+//				"e9558d8cbbc1c11f", false);
 		
 		StatService.setSessionTimeOut(30);
 
@@ -197,6 +200,12 @@ public class MainActivity extends ActivityGroup {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
+	}
+	
+	@Override
+	protected void onDestroy() {
+		AdsMogoLayout.clear();
+		super.onDestroy();
 	}
 
 

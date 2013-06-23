@@ -126,6 +126,7 @@ public class SchedulerEventService extends Service {
 //					PendingIntent intentExecuted = PendingIntent.getBroadcast(ctx, 0, i, PendingIntent.FLAG_CANCEL_CURRENT);
 //					alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, now.getTimeInMillis(), interval * 1000, intentExecuted);
 			
+			now = Calendar.getInstance();
 			if(updateThread == null && !isRunning 
 					&& TestNetworkStatus() != -1 
 					&& (now.getTimeInMillis() - lastUpdateTime >= (interval - 300) * 1000) ) {
@@ -136,7 +137,6 @@ public class SchedulerEventService extends Service {
 				updateThread = new UpdateThread();
 				updateThread.autoDownloadInWifi = autoDownloadInWifi;
 				updateThread.start();
-				now = Calendar.getInstance();
 				lastUpdateTime = now.getTimeInMillis();
 			}
 		}

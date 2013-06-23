@@ -47,34 +47,33 @@ public final class R {
     }
     public static final class id {
         public static final int aboutDisplayer=0x7f090000;
-        public static final int action_settings=0x7f09001e;
-        public static final int adcontainer=0x7f090015;
+        public static final int action_settings=0x7f09001d;
         public static final int adcontainer2=0x7f09000e;
         public static final int bookDisplayer=0x7f09000d;
         public static final int book_list=0x7f090014;
         public static final int bth_refresh=0x7f090013;
-        public static final int btnReload=0x7f090019;
+        public static final int btnReload=0x7f090018;
         public static final int btn_OK=0x7f090012;
         public static final int chapter_list=0x7f09000b;
         public static final int ci_dian=0x7f090010;
         public static final int circlie_progressbar=0x7f090004;
         public static final int etSearchName=0x7f090011;
         public static final int hometabs=0x7f090003;
-        public static final int latest_title=0x7f090017;
+        public static final int latest_title=0x7f090016;
         public static final int liChapter=0x7f09000f;
         public static final int lin=0x7f090001;
-        public static final int list_item_author=0x7f09001b;
-        public static final int list_item_site=0x7f090016;
-        public static final int list_item_text=0x7f09001a;
+        public static final int list_item_author=0x7f09001a;
+        public static final int list_item_site=0x7f090015;
+        public static final int list_item_text=0x7f090019;
         public static final int loading=0x7f09000c;
         public static final int nPage=0x7f090009;
         public static final int pPage=0x7f090008;
-        public static final int pbRefreshSub=0x7f09001d;
-        public static final int read_title=0x7f09001c;
+        public static final int pbRefreshSub=0x7f09001c;
+        public static final int read_title=0x7f09001b;
         public static final int tabhost=0x7f090002;
         public static final int tvNet=0x7f090006;
         public static final int tvRefresh=0x7f090005;
-        public static final int tvTitle=0x7f090018;
+        public static final int tvTitle=0x7f090017;
         public static final int udPrompt=0x7f090007;
         public static final int update_list=0x7f09000a;
     }
