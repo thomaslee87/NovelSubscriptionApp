@@ -90,7 +90,7 @@
 		</PreferenceScreen>  --> 
 	</PreferenceCategory>  
 	  
-	<PreferenceCategory android:title="功能选项">  
+	<!--PreferenceCategory android:title="功能选项">  
 	    <CheckBoxPreference  
 			android:key="autoDownloadInWifi"  
 			android:title="有更新时自动下载（仅在wifi下有效）"  
@@ -98,7 +98,7 @@
 			android:summaryOff="关闭"  
 			android:defaultValue="true"  
 		/> 
-		<!-- CheckBoxPreference  
+		<CheckBoxPreference  
 			android:key="lowCostMode"  
 			android:title="省流量模式（23:00~7:00不更新）"  
 			android:summaryOn="开启"  
@@ -111,6 +111,6 @@
 			android:summaryOn="开启"  
 			android:summaryOff="关闭"  
 			android:defaultValue="false"  
-		/-->
-	</PreferenceCategory>  
+		/>
+	</PreferenceCategory-->  
 </PreferenceScreen> 

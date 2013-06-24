@@ -3,7 +3,6 @@ package com.novel.subscription;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -721,18 +720,18 @@ public class SubscriptionActivity extends Activity {
             	Pattern pOrder = Pattern.compile(book.getSrcEntity().getPatternOrder());
             	Pattern pLatestTitle = Pattern.compile(book.getSrcEntity().getPatternLatestTitle());
             	Pattern pPage = Pattern.compile(book.getSrcEntity().getPatternPage());
-            	Pattern pInvalidTitle = Pattern.compile("<.*>.*</.*>");
+            	Pattern pInvalidTitle = Pattern.compile("(<.*>.*</.*>)|(\\[[0-9A-Za-z#]\\])");
         		
         		//从最后一页开始查找，即从最新开始找
         		do{
 	        		String res = HtmlService.getHtmlByGet(book.getSrcEntity().getDomain() + book.getUrl() + "&pi=" + fetchPageNum);
 	            	
-	            	Matcher mLatestTitle = pLatestTitle.matcher(res);
-	        		if(mLatestTitle.find()) {
-	        			if(mLatestTitle.group(1).equals(subscription.getLatestTitle()))
-	        				continue;
-	        			else
-	        				needUpdateDb = true;
+//	            	Matcher mLatestTitle = pLatestTitle.matcher(res);
+//	        		if(mLatestTitle.find()) {
+//	        			if(mLatestTitle.group(1).equals(subscription.getLatestTitle()))
+//	        				continue;
+//	        			else
+//	        				needUpdateDb = true;
 	//        			Message msg = handler.obtainMessage();
 	//        			msg.what = UPDATING_CODE;
 	//        			Bundle bundle = new Bundle();
@@ -740,7 +739,7 @@ public class SubscriptionActivity extends Activity {
 	//        			bundle.putString("title", mLatestTitle.group(1));
 	//        			msg.setData(bundle);
 	//        			handler.sendMessage(msg);
-	        		}
+//	        		}
 	            	
 	        		Matcher mBody = pBody.matcher(res);
 	    			String url = "";
@@ -779,8 +778,8 @@ public class SubscriptionActivity extends Activity {
 	            				}
 	            				if(chapterOrder > book.getUpdateOrder()) {
 	            					BookChapterEntity bookChapter = new BookChapterEntity(-1, title, url, 0, 0, 0, chapterOrder, 1, book);
-	            					if(book.getUpdateOrder() != 0 && autoDownloadInWifi)
-	            						bookChapter.setContent(readChapterContent(bookChapter));
+//	            					if(book.getUpdateOrder() != 0 && autoDownloadInWifi)
+//	            						bookChapter.setContent(readChapterContent(bookChapter));
 	            					chapterQueue.add(bookChapter);
 	            				}
 	            				else 

@@ -6,8 +6,6 @@ import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Iterator;
 
-import net.youmi.android.AdManager;
-
 import org.apache.http.util.EncodingUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;

@@ -262,7 +262,7 @@ public class SchedulerEventService extends Service {
             	Pattern pBody = Pattern.compile(book.getSrcEntity().getPatternBody());
             	Pattern pOrder = Pattern.compile(book.getSrcEntity().getPatternOrder());
             	Pattern pPage = Pattern.compile(book.getSrcEntity().getPatternPage());
-            	Pattern pInvalidTitle = Pattern.compile("<.*>.*</.*>");
+            	Pattern pInvalidTitle = Pattern.compile("<.*>.*</.*>|\\[[A-Za-z#]\\]");
             	
         		//从最后一页开始查找，即从最新开始找
         		do{
@@ -300,8 +300,8 @@ public class SchedulerEventService extends Service {
 	            				}
 	            				if(chapterOrder > book.getUpdateOrder()) {
 	            					BookChapterEntity bookChapter = new BookChapterEntity(-1, title, url, 0, 0, 0, chapterOrder, 1, book);
-	            					if(book.getUpdateOrder() != 0 && autoDownloadInWifi)
-	            						bookChapter.setContent(readChapterContent(bookChapter));
+//	            					if(book.getUpdateOrder() != 0 && autoDownloadInWifi)
+//	            						bookChapter.setContent(readChapterContent(bookChapter));
 	            					chapterQueue.add(bookChapter);
 	            				}
 	            				else 

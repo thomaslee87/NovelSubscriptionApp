@@ -1,11 +1,10 @@
 package com.novel.subscription;
 
-import com.baidu.mobstat.StatService;
-import com.novel.subscription.R;
-
 import android.app.Activity;
 import android.os.Bundle;
 import android.webkit.WebView;
+
+import com.baidu.mobstat.StatService;
 
 public class MoreActivity extends Activity {
 	
