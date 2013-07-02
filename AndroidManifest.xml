@@ -64,20 +64,20 @@
             android:name="com.adsmogo.adview.AdsMogoWebView"
             android:label="@string/app_name" >
         </activity>
-        <!-- 注册Service，应用下载所需 -->
+        <!-- 注册Service，应用下载所需 >
         <service
             android:name="com.adsmogo.controller.service.UpdateService"
             android:exported="true"
-            android:process=":remote" />
-        <!-- 注册Service，应用被安装所用 -->
+            android:process=":remote" /-->
+        <!-- 注册Service，应用被安装所用 >
         <service
             android:name="com.adsmogo.controller.service.CountService"
             android:exported="true"
-            android:process=":remote" />
+            android:process=":remote" /-->
         
                 
 	 	<!-- 有米传媒 Android SDK 配置(可直接复制节点) -->
-        <!-- SDK 必须配置 -->
+        <!-- SDK 必须配置 >
         <activity
             android:name="net.youmi.android.AdBrowser"
             android:configChanges="keyboard|keyboardHidden|orientation"
@@ -95,12 +95,7 @@
 
                 <data android:scheme="package" />
             </intent-filter>
-        </receiver>
-        
-		<!-- 声明多盟的Activity -->
-        <!-- activity
-            android:name="cn.domob.android.ads.DomobActivity"
-            android:theme="@android:style/Theme.Translucent" /-->
+        </receiver-->
         
 		<!-- 添加百度应用详情Activity -->
         <meta-data
